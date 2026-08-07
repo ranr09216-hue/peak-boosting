@@ -42,7 +42,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 BASE_DIR = Path(__file__).resolve().parent
 DB_FILE = Path(os.environ.get("DB_PATH", str(BASE_DIR / "orders.db")))
 LEGACY_JSON = BASE_DIR / "orders.json"
-GAMES = {"王者荣耀", "英雄联盟", "和平精英", "原神"}
+GAMES = {"王者荣耀", "英雄联盟", "和平精英", "原神", "三角洲行动", "永劫无间"}
 STATUS_FLOW = ["待确认", "进行中", "已完成"]
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 DEFAULT_ADMIN_USED = "ADMIN_PASSWORD" not in os.environ
@@ -78,7 +78,16 @@ def init_db():
             """
         )
         conn.commit()
+    ensure_progress_column()
     _import_legacy_json()
+
+
+def ensure_progress_column():
+    with db_connect() as conn:
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(orders)").fetchall()]
+        if "progress" not in cols:
+            conn.execute("ALTER TABLE orders ADD COLUMN progress INTEGER NOT NULL DEFAULT 0")
+            conn.commit()
 
 
 def _import_legacy_json():
@@ -125,6 +134,7 @@ def row_to_order(row):
         "targetRank": row["target_rank"],
         "contact": row["contact"],
         "status": row["status"],
+        "progress": row["progress"] if "progress" in row.keys() else 0,
         "created_at": row["created_at"],
     }
 
@@ -163,14 +173,25 @@ def create_order(payload):
     return row_to_order(row)
 
 
-def update_order_status(order_id, status):
+def update_order_status(order_id, status, progress=None):
     if status not in STATUS_FLOW:
         return None, "无效状态"
+    if progress is not None:
+        try:
+            progress = max(0, min(100, int(progress)))
+        except (TypeError, ValueError):
+            return None, "进度必须是 0-100 的数字"
     with _lock, db_connect() as conn:
-        cur = conn.execute(
-            "UPDATE orders SET status = ? WHERE id = ?",
-            (status, order_id),
-        )
+        if progress is not None:
+            cur = conn.execute(
+                "UPDATE orders SET status = ?, progress = ? WHERE id = ?",
+                (status, progress, order_id),
+            )
+        else:
+            cur = conn.execute(
+                "UPDATE orders SET status = ? WHERE id = ?",
+                (status, order_id),
+            )
         conn.commit()
         if cur.rowcount == 0:
             return None, "订单不存在"
@@ -312,6 +333,20 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, "orders": list_orders(contact or None)})
             return
 
+        if path == "/api/orders/latest":
+            query = parse_qs(parsed.query)
+            contact = unquote(query.get("contact", [""])[0]).strip()
+            with db_connect() as conn:
+                if contact:
+                    row = conn.execute(
+                        "SELECT * FROM orders WHERE lower(contact) LIKE ? ORDER BY id DESC LIMIT 1",
+                        ("%" + contact.lower() + "%",),
+                    ).fetchone()
+                else:
+                    row = conn.execute("SELECT * FROM orders ORDER BY id DESC LIMIT 1").fetchone()
+            self._send_json({"ok": True, "order": row_to_order(row) if row else None})
+            return
+
         if path == "/api/admin/me":
             if self._require_admin():
                 self._send_json({"ok": True, "admin": True})
@@ -393,7 +428,11 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json({"ok": False, "error": "无效订单 ID"}, 400)
                 return
             payload = self._read_json()
-            order, err = update_order_status(order_id, str(payload.get("status", "")).strip())
+            order, err = update_order_status(
+                order_id,
+                str(payload.get("status", "")).strip(),
+                payload.get("progress"),
+            )
             if err:
                 self._send_json({"ok": False, "error": err}, 400)
                 return
