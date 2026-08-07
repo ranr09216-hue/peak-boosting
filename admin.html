@@ -83,6 +83,12 @@ tr:hover td { background: rgba(255, 255, 255, .03); }
   background: rgba(7, 11, 20, .7); color: var(--text);
   border: 1px solid var(--border); outline: none; cursor: pointer;
 }
+.progress-input {
+  width: 64px; padding: 6px 8px; border-radius: 10px; font: inherit; font-size: 12px;
+  background: rgba(7, 11, 20, .7); color: var(--text);
+  border: 1px solid var(--border); outline: none;
+}
+.progress-input:focus { border-color: var(--accent); }
 .empty { text-align: center; color: var(--text2); padding: 36px 0; font-size: 14px; }
 .toast {
   position: fixed; top: 22px; left: 50%; transform: translate(-50%, -16px);
@@ -132,6 +138,7 @@ tr:hover td { background: rgba(255, 255, 255, .03); }
             <th>段位</th>
             <th>联系方式</th>
             <th>提交时间</th>
+            <th>进度</th>
             <th>状态</th>
             <th>操作</th>
           </tr>
@@ -199,6 +206,7 @@ tr:hover td { background: rgba(255, 255, 255, .03); }
         '<td>' + esc(o.currentRank) + ' → ' + esc(o.targetRank) + '</td>' +
         '<td>' + esc(o.contact) + '</td>' +
         '<td>' + esc(o.created_at) + '</td>' +
+        '<td><input type="number" class="progress-input" min="0" max="100" value="' + (o.progress || 0) + '" data-id="' + o.id + '">%</td>' +
         '<td><span class="status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></td>' +
         '<td style="display:flex;gap:8px">' +
           '<select class="status-select" data-id="' + o.id + '" data-action="status">' +
@@ -280,12 +288,36 @@ tr:hover td { background: rgba(255, 255, 255, .03); }
   tbody.addEventListener('change', async function (e) {
     if (e.target.dataset.action !== 'status') return;
     try {
+      const progress = tbody.querySelector('.progress-input[data-id="' + e.target.dataset.id + '"]');
       await api('/api/admin/orders/' + e.target.dataset.id + '/status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: e.target.value })
+        body: JSON.stringify({ status: e.target.value, progress: progress ? progress.value : undefined })
       });
       showToast('状态已更新');
+      loadOrders();
+    } catch (err) {
+      showToast(err.message);
+      loadOrders();
+    }
+  });
+
+  tbody.addEventListener('change', async function (e) {
+    if (e.target.classList && !e.target.classList.contains('progress-input')) return;
+    const val = parseInt(e.target.value, 10);
+    if (isNaN(val) || val < 0 || val > 100) {
+      showToast('进度需在 0-100 之间');
+      loadOrders();
+      return;
+    }
+    try {
+      const statusSel = tbody.querySelector('.status-select[data-id="' + e.target.dataset.id + '"]');
+      await api('/api/admin/orders/' + e.target.dataset.id + '/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: statusSel ? statusSel.value : '待确认', progress: val })
+      });
+      showToast('进度已更新为 ' + val + '%');
       loadOrders();
     } catch (err) {
       showToast(err.message);
