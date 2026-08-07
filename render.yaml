@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: peak-boosting
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python order_server.py
+    envVars:
+      - key: ADMIN_PASSWORD
+        sync: false
