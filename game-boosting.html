@@ -1,0 +1,1766 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peak 代练 — 把上分交给专注的人</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #070b14;
+  --bg-deep: #0a0e18;
+  --text: #f5f5f7;
+  --text2: #a1a1a6;
+  --accent: #0a84ff;
+  --accent-soft: rgba(10, 132, 255, .16);
+  --card: rgba(28, 30, 36, .72);
+  --card-solid: #171a21;
+  --border: rgba(255, 255, 255, .12);
+  --shadow: 0 18px 50px rgba(0, 0, 0, .5);
+  --shadow-hover: 0 26px 64px rgba(0, 0, 0, .62);
+  --grid-line: rgba(255, 255, 255, .05);
+  --hero-glow-color: rgba(10, 132, 255, .14);
+  --ring-color: rgba(10, 132, 255, .42);
+  --mil: #9ab86a;
+  --mil-soft: rgba(154, 184, 106, .16);
+  --map-lane: rgba(10, 132, 255, .45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --bg-deep: #0a0a0c;
+    --text: #f5f5f7;
+    --text2: #a1a1a6;
+    --accent: #0a84ff;
+    --accent-soft: rgba(10, 132, 255, .16);
+    --card: rgba(28, 28, 30, .72);
+    --card-solid: #1c1c1e;
+    --border: rgba(255, 255, 255, .12);
+    --shadow: 0 18px 50px rgba(0, 0, 0, .5);
+    --shadow-hover: 0 26px 64px rgba(0, 0, 0, .62);
+    --grid-line: rgba(255, 255, 255, .05);
+    --hero-glow-color: rgba(10, 132, 255, .14);
+    --ring-color: rgba(10, 132, 255, .42);
+    --mil: #9ab86a;
+    --mil-soft: rgba(154, 184, 106, .16);
+    --map-lane: rgba(10, 132, 255, .45);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+::selection { background: var(--accent-soft); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Game-style ambient background ---------- */
+.bg-fx {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(1100px 700px at 50% -8%, var(--hero-glow-color), transparent 62%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: auto, 52px 52px, 52px 52px;
+  -webkit-mask-image: radial-gradient(ellipse 100% 92% at 50% 0%, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse 100% 92% at 50% 0%, #000 30%, transparent 78%);
+}
+.bg-glyphs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.glyph {
+  position: absolute; width: 58px; height: 58px; border-radius: 18px;
+  display: grid; place-items: center; color: var(--accent);
+  background: var(--card); border: 1px solid var(--border);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--shadow); opacity: .55;
+  will-change: transform;
+}
+.glyph svg { width: 26px; height: 26px; }
+.glyph-1 { top: 17%; left: 4.5%; }
+.glyph-2 { top: 31%; right: 5.5%; }
+.glyph-3 { bottom: 24%; left: 7%; }
+.glyph-4 { bottom: 31%; right: 4.5%; }
+main, footer { position: relative; z-index: 1; }
+section[id] { scroll-margin-top: 84px; }
+
+.bg-stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.stage-base {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(1100px 620px at 50% -10%, rgba(10, 132, 255, .13), transparent 62%),
+    radial-gradient(900px 560px at 108% 112%, rgba(154, 184, 106, .10), transparent 62%),
+    radial-gradient(900px 560px at -8% 112%, rgba(183, 140, 255, .10), transparent 62%),
+    linear-gradient(180deg, #070b14 0%, #0b1224 55%, #07130f 100%);
+}
+.stage-char {
+  position: absolute; bottom: -5%; width: min(42vw, 560px); opacity: .5;
+  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .5));
+  will-change: transform;
+}
+.stage-mage { left: -2%; }
+.stage-op { right: -2%; }
+.stage-char svg { width: 100%; height: auto; display: block; }
+.stage-grid {
+  position: absolute; left: -12%; right: -12%; bottom: -16%; height: 52%;
+  background:
+    linear-gradient(to top, rgba(10, 132, 255, .10), transparent 72%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .045) 0 1px, transparent 1px 52px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 52px);
+  transform: perspective(560px) rotateX(34deg);
+  transform-origin: bottom;
+  -webkit-mask-image: linear-gradient(to top, #000 20%, transparent 88%);
+  mask-image: linear-gradient(to top, #000 20%, transparent 88%);
+}
+.stage-vignette {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 68% 58% at 50% 40%, transparent 30%, rgba(3, 6, 12, .42) 86%),
+    linear-gradient(to bottom, rgba(3, 6, 12, .5), transparent 22%);
+}
+.stage-tag {
+  position: absolute; z-index: 1; padding: 8px 15px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em; color: #fff;
+  background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  white-space: nowrap;
+}
+.stage-tag-l { left: 2.5%; bottom: 17%; }
+.stage-tag-r { right: 2.5%; bottom: 17%; }
+
+/* ---------- Game characters & content ---------- */
+.profile-card {
+  position: absolute; z-index: 0; width: 138px; padding: 12px;
+  border-radius: 20px; background: var(--card); border: 1px solid var(--border);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: var(--shadow); opacity: .92; pointer-events: none;
+  will-change: transform;
+}
+.profile-1 { top: 145px; left: 2%; }
+.profile-2 { top: 168px; right: 2%; }
+.pc-top { display: flex; gap: 9px; align-items: center; }
+.pc-icon {
+  width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+  display: grid; place-items: center; color: var(--accent);
+  background: linear-gradient(135deg, rgba(0, 113, 227, .16), rgba(100, 210, 255, .24));
+}
+.profile-2 .pc-icon { color: var(--mil); background: linear-gradient(135deg, var(--mil-soft), rgba(255, 255, 255, .04)); }
+.pc-icon svg { width: 22px; height: 22px; }
+.pc-name { font-size: 12px; font-weight: 700; letter-spacing: -0.01em; }
+.pc-role { font-size: 10px; color: var(--text2); margin-top: 1px; }
+.pc-stats { margin-top: 10px; display: grid; gap: 5px; }
+.pc-stat { display: flex; justify-content: space-between; font-size: 9px; color: var(--text2); }
+.pc-bar { height: 3px; border-radius: 999px; background: rgba(120, 120, 128, .18); overflow: hidden; margin-top: 2px; }
+.pc-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.profile-2 .pc-bar i { background: var(--mil); }
+
+.minimap {
+  position: absolute; z-index: 0; top: 292px; right: 4%; width: 118px; padding: 10px 10px 8px;
+  border-radius: 18px; background: var(--card); border: 1px solid var(--border);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--shadow); opacity: .88; pointer-events: none;
+  will-change: transform;
+}
+.minimap svg { width: 100%; height: auto; display: block; }
+.mm-frame { stroke: var(--border); }
+.mm-lane { stroke: var(--map-lane); }
+.mm-player { fill: var(--accent); }
+.mm-label { display: block; text-align: center; font-size: 9px; color: var(--text2); margin-top: 6px; letter-spacing: .04em; }
+
+.hot-strip { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 28px; }
+.hot-tag {
+  font-size: 12px; font-weight: 600; color: var(--text2);
+  background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+  padding: 7px 14px; backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+.hot-tag b { color: var(--text); font-weight: 700; }
+
+.hud-corners { position: absolute; inset: -12px; pointer-events: none; z-index: 2; }
+.hud-corners span {
+  position: absolute; width: 16px; height: 16px;
+  border: 0 solid var(--accent); opacity: .55;
+}
+.hud-corners span:nth-child(1) { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 7px; }
+.hud-corners span:nth-child(2) { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 7px; }
+.hud-corners span:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 7px; }
+.hud-corners span:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 7px; }
+
+/* ---------- Nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(22, 22, 24, .72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  transition: box-shadow .3s ease;
+}
+@media (prefers-color-scheme: dark) {
+  .nav { background: rgba(22, 22, 24, .72); }
+}
+.nav.scrolled { box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 8px 28px rgba(0,0,0,.07); }
+.nav-inner {
+  max-width: 1060px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+}
+.brand { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; color: var(--text); }
+.brand span { color: var(--accent); }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: 14px; color: var(--text2); text-decoration: none; transition: color .2s; }
+.nav-links a:hover { color: var(--text); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; cursor: pointer; border-radius: 980px;
+  font: inherit; font-size: 16px; font-weight: 600;
+  padding: 13px 26px; text-decoration: none;
+  transition: transform .12s ease-out, box-shadow .25s ease, background .2s ease;
+  will-change: transform;
+}
+.btn-primary {
+  background: var(--accent); color: #fff;
+  box-shadow: 0 8px 20px rgba(0, 113, 227, .28);
+}
+.btn-primary:hover { background: #0077ed; transform: translateY(-1px); }
+.btn-primary:active { transform: scale(.96); box-shadow: 0 4px 12px rgba(0, 113, 227, .22); }
+.btn-ghost { background: rgba(120, 120, 128, .12); color: var(--text); }
+.btn-ghost:hover { background: rgba(120, 120, 128, .2); }
+.btn-ghost:active { transform: scale(.96); }
+.btn-small { padding: 9px 18px; font-size: 14px; }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; max-width: 1080px; margin: 0 auto; padding: 32px 20px 72px; text-align: center; }
+.hero-panel {
+  position: relative; overflow: hidden; border-radius: 40px;
+  padding: 96px 30px 62px; color: #f5f5f7;
+  background:
+    radial-gradient(900px 480px at 50% -12%, rgba(100, 210, 255, .10), transparent 62%),
+    linear-gradient(168deg, rgba(12, 18, 38, .68) 0%, rgba(17, 29, 56, .55) 52%, rgba(10, 26, 22, .58) 100%);
+  border: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, .32);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+}
+.hero-panel::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse 92% 80% at 50% 45%, #000 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse 92% 80% at 50% 45%, #000 25%, transparent 78%);
+}
+.hero-content { position: relative; z-index: 1; }
+.hero-panel .eyebrow { color: #64d2ff; }
+.hero-panel .hero-sub { color: rgba(245, 245, 247, .74); }
+.hero-panel .btn-ghost { background: rgba(255, 255, 255, .14); color: #fff; }
+.hero-panel .btn-ghost:hover { background: rgba(255, 255, 255, .22); }
+.hero-panel .hot-tag { color: rgba(245, 245, 247, .72); background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .12); }
+.hero-panel .hot-tag b { color: #fff; }
+.hero-panel .trust-item { background: rgba(255, 255, 255, .07); border-color: rgba(255, 255, 255, .1); backdrop-filter: blur(16px) saturate(160%); }
+.hero-panel .trust-num { color: #fff; }
+.hero-panel .trust-label { color: rgba(245, 245, 247, .62); }
+.hero-panel .hero-card { background: rgba(16, 22, 34, .72); border-color: rgba(255, 255, 255, .12); box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
+.hero-panel .hc-pill { background: rgba(52, 199, 89, .18); }
+.hero-panel .hc-cell { background: rgba(255, 255, 255, .06); }
+.hero-panel .hc-cell small { color: rgba(245, 245, 247, .58); }
+.hero-panel .hc-cell b { color: #fff; }
+.hero-panel .hc-progress-row { color: rgba(245, 245, 247, .58); }
+.hero-panel .hc-progress-row b { color: #fff; }
+.hero-panel .hc-chip { color: #fff; background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .14); }
+.hero-panel .profile-card { color: #fff; background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .14); }
+.hero-panel .pc-role { color: rgba(245, 245, 247, .62); }
+.hero-panel .minimap { background: rgba(10, 16, 28, .62); border-color: rgba(255, 255, 255, .14); }
+.hero-panel .mm-label { color: rgba(245, 245, 247, .6); }
+
+.hero-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.scene-char { position: absolute; bottom: -4%; width: min(36vw, 470px); opacity: .62; filter: drop-shadow(0 24px 44px rgba(0, 0, 0, .45)); will-change: transform; }
+.scene-mage { left: -3%; }
+.scene-op { right: -3%; }
+.scene-char svg { width: 100%; height: auto; display: block; }
+.scene-ground {
+  position: absolute; left: -12%; right: -12%; bottom: -14%; height: 46%;
+  background:
+    linear-gradient(to top, rgba(100, 210, 255, .08), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .04) 0 1px, transparent 1px 48px);
+  transform: perspective(500px) rotateX(30deg);
+  transform-origin: bottom;
+}
+.scene-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 78% 62% at 50% 42%, transparent 26%, rgba(6, 10, 18, .55) 88%); }
+.scene-tag {
+  position: absolute; z-index: 2; padding: 7px 14px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em; color: #fff;
+  background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .16);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  white-space: nowrap;
+}
+.scene-tag-l { left: 24%; bottom: 15%; }
+.scene-tag-r { right: 24%; bottom: 15%; }
+.hero-glow {
+  position: absolute; left: 50%; top: -180px; transform: translateX(-50%);
+  width: min(900px, 100%); height: 560px; pointer-events: none; z-index: 0;
+  background: radial-gradient(closest-side, rgba(0, 113, 227, .14), transparent 70%);
+}
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; color: var(--accent); margin-bottom: 20px; }
+.display {
+  font-size: clamp(2.6rem, 6.5vw, 4.6rem);
+  line-height: 1.04; letter-spacing: -0.025em; font-weight: 700;
+  font-optical-sizing: auto;
+}
+.hero-sub { max-width: 560px; margin: 22px auto 0; color: var(--text2); font-size: 17px; line-height: 1.65; }
+.hero-cta { display: flex; gap: 12px; justify-content: center; margin-top: 34px; flex-wrap: wrap; }
+
+.hero-card {
+  position: relative; z-index: 1;
+  max-width: 640px; margin: 58px auto 0; padding: 28px;
+  text-align: left; transform-style: preserve-3d; will-change: transform;
+}
+.hero-card::after {
+  content: ""; position: absolute; inset: -34px; border-radius: 44px;
+  border: 1px solid var(--ring-color); pointer-events: none;
+  animation: level-ring 1.2s cubic-bezier(.21, 1.02, .35, 1) .35s both;
+}
+@keyframes level-ring {
+  0% { transform: scale(.84); opacity: 0; }
+  22% { opacity: .85; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+.hc-chip {
+  position: absolute; z-index: 2; display: inline-flex; align-items: center;
+  padding: 9px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; color: var(--text);
+  background: var(--card); border: 1px solid var(--border);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--shadow); white-space: nowrap;
+  animation: chip-in .7s cubic-bezier(.21, 1.02, .35, 1) .95s both;
+}
+.hc-chip-1 { top: -16px; right: -12px; }
+.hc-chip-2 { bottom: -16px; left: -14px; }
+.chip-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 7px; }
+.chip-dot.green { background: #34c759; }
+.chip-dot.blue { background: var(--accent); }
+@keyframes chip-in {
+  from { opacity: 0; transform: translateY(12px) scale(.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.hc-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.hc-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.hc-pill {
+  font-size: 12px; font-weight: 600; color: #248a3d;
+  background: rgba(52, 199, 89, .14); padding: 5px 12px; border-radius: 999px;
+  white-space: nowrap;
+}
+.hc-progress { margin: 20px 0 16px; }
+.hc-progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+.hc-progress-row b { color: var(--text); font-weight: 600; }
+.progress-track { height: 6px; border-radius: 999px; background: rgba(120, 120, 128, .18); overflow: hidden; }
+.progress-fill {
+  height: 100%; width: 0%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #64d2ff);
+}
+.hc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hc-cell { background: rgba(120, 120, 128, .08); border-radius: 14px; padding: 12px 14px; }
+.hc-cell small { display: block; font-size: 11px; color: var(--text2); }
+.hc-cell b { display: block; font-size: 14px; margin-top: 3px; font-weight: 600; }
+.hc-actions { display: flex; gap: 10px; margin-top: 20px; }
+.hc-actions .btn { flex: 1; padding: 10px 14px; font-size: 14px; }
+
+.trust-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 26px; }
+.trust-item {
+  background: var(--card); backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--border); border-radius: 18px; padding: 18px 12px;
+}
+.trust-num { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.trust-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* ---------- Sections ---------- */
+.section { max-width: 1060px; margin: 0 auto; padding: 76px 24px; }
+.section-head { text-align: center; max-width: 620px; margin: 0 auto 46px; }
+.section-kicker { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .04em; margin-bottom: 10px; }
+.section-title { font-size: clamp(1.8rem, 3.4vw, 2.6rem); letter-spacing: -0.02em; line-height: 1.12; font-weight: 700; }
+.section-sub { color: var(--text2); margin-top: 14px; line-height: 1.6; }
+
+.glass {
+  background: var(--card);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+/* Steps */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.step { padding: 26px 24px; border-radius: 22px; background: var(--card); border: 1px solid var(--border); }
+.step-num { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: .02em; }
+.step h3 { margin: 14px 0 8px; font-size: 18px; letter-spacing: -0.01em; }
+.step p { color: var(--text2); font-size: 14px; line-height: 1.55; }
+
+/* Roster */
+.roster-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.roster-card {
+  padding: 24px; border-radius: 24px;
+  background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
+  transition: transform .4s cubic-bezier(.21, 1.02, .35, 1), box-shadow .4s ease;
+  will-change: transform;
+}
+.roster-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+.roster-crest {
+  width: 76px; height: 76px; border-radius: 22px; margin-bottom: 18px;
+  display: grid; place-items: center; color: var(--accent);
+  background: linear-gradient(135deg, rgba(0, 113, 227, .14), rgba(100, 210, 255, .22));
+}
+.roster-card[data-type="op"] .roster-crest {
+  color: var(--mil); background: linear-gradient(135deg, var(--mil-soft), rgba(255, 255, 255, .04));
+}
+.roster-crest svg { width: 40px; height: 40px; }
+.roster-kicker { font-size: 11px; font-weight: 700; letter-spacing: .05em; color: var(--text2); }
+.roster-card[data-type="op"] .roster-kicker { color: var(--mil); }
+.roster-card h3 { font-size: 18px; letter-spacing: -0.01em; margin: 7px 0 4px; }
+.roster-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.roster-stats { display: grid; gap: 9px; margin-top: 18px; }
+.roster-stat { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); }
+.roster-bar { height: 4px; border-radius: 999px; background: rgba(120, 120, 128, .16); overflow: hidden; margin-top: 3px; }
+.roster-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.roster-card[data-type="op"] .roster-bar i { background: var(--mil); }
+.roster-art {
+  position: relative; height: 158px; margin: -24px -24px 18px;
+  border-radius: 24px 24px 0 0; overflow: hidden;
+  display: grid; place-items: center;
+  background:
+    radial-gradient(240px 150px at 50% 120%, rgba(100, 210, 255, .18), transparent 70%),
+    linear-gradient(170deg, rgba(13, 20, 38, .14), rgba(8, 12, 22, .32));
+}
+.roster-card[data-type="op"] .roster-art {
+  background:
+    radial-gradient(240px 150px at 50% 120%, rgba(154, 184, 106, .16), transparent 70%),
+    linear-gradient(170deg, rgba(16, 22, 14, .16), rgba(8, 12, 10, .34));
+}
+.roster-art::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, .16), transparent 48%);
+}
+.roster-art svg { height: 158px; width: auto; }
+.roster-tag {
+  position: absolute; top: 10px; left: 10px; z-index: 1;
+  font-size: 10px; font-weight: 700; letter-spacing: .05em;
+  padding: 4px 10px; border-radius: 999px; color: #fff;
+  background: rgba(0, 0, 0, .38); border: 1px solid rgba(255, 255, 255, .16);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+
+/* Services */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.service {
+  padding: 28px 26px; border-radius: 24px;
+  background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
+  transition: transform .4s cubic-bezier(.21, 1.02, .35, 1), box-shadow .4s ease;
+  will-change: transform;
+}
+.service:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+.service:active { transform: translateY(-2px) scale(.99); }
+.service-icon {
+  width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
+  font-size: 22px;
+  background: linear-gradient(135deg, rgba(0, 113, 227, .12), rgba(100, 210, 255, .2));
+}
+.service h3 { margin: 18px 0 6px; font-size: 19px; letter-spacing: -0.01em; }
+.service-price { font-size: 15px; color: var(--accent); font-weight: 600; margin-bottom: 14px; }
+.service ul { list-style: none; display: grid; gap: 8px; }
+.service li { position: relative; padding-left: 22px; font-size: 14px; color: var(--text2); }
+.service li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+/* Pricing */
+.plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+.plan {
+  position: relative; padding: 32px 28px; border-radius: 26px;
+  background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
+  transition: transform .4s cubic-bezier(.21, 1.02, .35, 1), box-shadow .4s ease;
+  will-change: transform;
+}
+.plan:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+.plan-popular { border: 1px solid rgba(0, 113, 227, .45); box-shadow: 0 24px 60px rgba(0, 113, 227, .16); }
+.plan-badge {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #fff; font-size: 12px; font-weight: 600;
+  padding: 5px 14px; border-radius: 999px; white-space: nowrap;
+}
+.plan-name { font-size: 16px; font-weight: 600; }
+.plan-desc { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.5; }
+.plan-price { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; margin: 20px 0 4px; }
+.plan-price small { font-size: 14px; color: var(--text2); font-weight: 500; letter-spacing: 0; }
+.plan ul { list-style: none; display: grid; gap: 9px; margin: 18px 0 24px; }
+.plan li { position: relative; padding-left: 22px; font-size: 14px; color: var(--text2); }
+.plan li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+.plan .btn { width: 100%; }
+
+/* Testimonials */
+.quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.quote { padding: 26px; border-radius: 22px; background: var(--card); border: 1px solid var(--border); }
+.quote p { font-size: 15px; line-height: 1.65; }
+.quote-who { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  color: #fff; font-size: 13px; font-weight: 700;
+  background: linear-gradient(135deg, #6e6e73, #1d1d1f);
+}
+.quote-name { font-size: 14px; font-weight: 600; }
+.quote-meta { font-size: 12px; color: var(--text2); }
+
+/* FAQ */
+.faq { max-width: 720px; margin: 0 auto; display: grid; gap: 12px; }
+.faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: none; border: 0; padding: 18px 22px;
+  font: inherit; font-size: 16px; font-weight: 600; color: var(--text);
+  cursor: pointer; text-align: left;
+}
+.faq-chev { color: var(--text2); transition: transform .3s ease; flex-shrink: 0; }
+.faq-item.open .faq-chev { transform: rotate(180deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .35s cubic-bezier(.32, .72, 0, 1); }
+.faq-a-inner { padding: 0 22px 20px; color: var(--text2); font-size: 14px; line-height: 1.65; }
+
+/* Orders */
+.orders-box {
+  max-width: 720px; margin: 0 auto; padding: 26px;
+  border-radius: 26px; background: var(--card); border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+.orders-search { display: flex; gap: 10px; }
+.orders-search input {
+  flex: 1; min-width: 0; padding: 12px 14px; border-radius: 14px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 15px; outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.orders-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10, 132, 255, .18); }
+.order-list { display: grid; gap: 10px; margin-top: 18px; }
+.order-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 16px 18px; border-radius: 18px;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--border);
+}
+.order-item-main b { font-size: 15px; letter-spacing: -0.01em; }
+.order-item-main span { display: block; font-size: 12px; color: var(--text2); margin-top: 4px; }
+.order-status { font-size: 12px; font-weight: 700; padding: 6px 13px; border-radius: 999px; white-space: nowrap; }
+.order-status.confirm { color: #64d2ff; background: rgba(10, 132, 255, .14); }
+.order-status.doing { color: #ffd60a; background: rgba(255, 214, 10, .12); }
+.order-status.done { color: #34c759; background: rgba(52, 199, 89, .14); }
+.orders-empty { color: var(--text2); font-size: 14px; text-align: center; padding: 20px 0 8px; }
+.orders-hint { font-size: 12px; color: var(--text2); margin-top: 14px; line-height: 1.6; }
+
+/* Order success (sheet) */
+.order-success { text-align: center; padding: 16px 4px 8px; }
+.os-icon {
+  width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 28px; color: #fff;
+  background: linear-gradient(135deg, #34c759, #30d158);
+  box-shadow: 0 12px 30px rgba(52, 199, 89, .35);
+}
+.order-success h3 { font-size: 20px; letter-spacing: -0.01em; margin-bottom: 8px; }
+.order-success p { color: var(--text2); font-size: 14px; line-height: 1.65; }
+.order-success b { color: var(--text); }
+.os-actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
+.os-note { font-size: 12px; color: var(--text2); margin-top: 14px; }
+
+/* Footer */
+footer { border-top: 1px solid var(--border); margin-top: 40px; }
+.footer-inner {
+  max-width: 1060px; margin: 0 auto; padding: 44px 24px 60px;
+  display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between; align-items: flex-start;
+}
+.footer-brand { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.footer-brand span { color: var(--accent); }
+.footer-links { display: flex; gap: 18px; font-size: 13px; }
+.footer-links a { color: var(--text2); text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: var(--text); }
+.footer-note { font-size: 12px; color: var(--text2); line-height: 1.7; max-width: 560px; }
+
+/* ---------- Sheet ---------- */
+.scrim {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(0, 0, 0, .4); opacity: 0; pointer-events: none;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: opacity .3s ease;
+}
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+  max-width: 620px; margin: 0 auto;
+  background: var(--card-solid);
+  border: 1px solid var(--border); border-bottom: 0;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -18px 60px rgba(0, 0, 0, .18);
+  transform: translate3d(0, 100%, 0);
+  visibility: hidden;
+  will-change: transform;
+}
+.sheet-handle { height: 40px; display: grid; place-items: start center; padding-top: 12px; cursor: grab; touch-action: none; }
+.sheet-handle:active { cursor: grabbing; }
+.sheet-handle span { width: 40px; height: 5px; border-radius: 999px; background: rgba(120, 120, 128, .32); }
+.sheet-body { padding: 6px 28px 34px; max-height: 74vh; overflow-y: auto; }
+.sheet-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.sheet-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.sheet-close {
+  width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(120, 120, 128, .14); color: var(--text); font-size: 16px;
+  display: grid; place-items: center; transition: transform .12s ease-out, background .2s;
+}
+.sheet-close:active { transform: scale(.9); }
+
+.field { margin-bottom: 16px; }
+.field > label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.field input, .field select {
+  width: 100%; padding: 12px 14px; border-radius: 14px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 15px; outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 113, 227, .18); }
+.field input.invalid { border-color: #ff453a; }
+.field .error { display: block; color: #ff453a; font-size: 12px; margin-top: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+.chips span {
+  display: inline-block; padding: 9px 16px; border-radius: 999px;
+  background: var(--bg); border: 1px solid var(--border);
+  font-size: 14px; cursor: pointer; user-select: none;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+.chips input:checked + span { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.form-note { font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 14px; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 22px; left: 50%; z-index: 200;
+  transform: translate(-50%, -16px);
+  background: rgba(28, 28, 30, .92); color: #fff;
+  padding: 12px 22px; border-radius: 999px; font-size: 14px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease, transform .35s cubic-bezier(.21, 1.02, .35, 1);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .steps, .cards, .plans, .quotes, .roster-grid { grid-template-columns: 1fr 1fr; }
+  .trust-row { grid-template-columns: 1fr 1fr; }
+  .stage-char { width: 58vw; }
+}
+@media (max-width: 1200px) {
+  .profile-card, .minimap { display: none; }
+}
+@media (max-width: 640px) {
+  .hero { padding: 14px 10px 56px; }
+  .hero-panel { padding: 76px 16px 42px; border-radius: 28px; }
+  .stage-char { width: 96vw; opacity: .3; }
+  .stage-mage { left: -44%; bottom: -2%; }
+  .stage-op { right: -44%; bottom: -2%; }
+  .stage-tag { display: none; }
+  .hero-glow { display: none; }
+  .steps, .cards, .plans, .quotes, .roster-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hc-grid { grid-template-columns: 1fr; }
+  .hc-chip { display: none; }
+  .orders-search { flex-direction: column; }
+  .order-item { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---------- Accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+  .hero-card { transform: none !important; }
+  .hero-card::after { animation: none; opacity: 0; }
+  .hc-chip { animation: none; opacity: 1; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .stage-char, .stage-tag { display: none; }
+  .nav, .glass, .service, .plan, .trust-item, .step, .quote, .faq-item,
+  .glyph, .hc-chip, .profile-card, .minimap, .hot-tag, .roster-card {
+    background: var(--card-solid);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="bg-stage" aria-hidden="true">
+  <div class="stage-base"></div>
+  <div class="stage-char stage-mage parallax" data-speed="0.04">
+    <svg viewBox="0 0 260 320" fill="none">
+      <defs>
+        <linearGradient id="sm-body" x1="130" y1="20" x2="130" y2="310" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#1d2a4d"/>
+          <stop offset="1" stop-color="#0a0e1a"/>
+        </linearGradient>
+        <radialGradient id="sm-aura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(130 240) scale(130)">
+          <stop stop-color="#64d2ff" stop-opacity=".30"/>
+          <stop offset="1" stop-color="#64d2ff" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="130" cy="240" r="130" fill="url(#sm-aura)"/>
+      <path d="M182 40 L182 214" stroke="#7fb4ff" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="182" cy="30" r="17" fill="#64d2ff"/>
+      <circle cx="182" cy="30" r="27" stroke="#64d2ff" stroke-opacity=".35" stroke-width="2"/>
+      <path d="M130 58 C 84 58 58 112 58 224 L 202 224 C 202 112 176 58 130 58 Z" fill="url(#sm-body)"/>
+      <path d="M130 42 C 104 42 90 76 90 98 C 106 84 120 78 130 92 C 140 78 154 84 170 98 C 170 76 156 42 130 42 Z" fill="#070b14"/>
+      <path d="M114 88 Q 130 108 146 88 Q 130 122 114 88" fill="#ffd97a" fill-opacity=".92"/>
+      <path d="M64 212 C 84 168 106 156 130 156 C 154 156 176 168 196 212 Z" fill="#64d2ff" fill-opacity=".08" stroke="#64d2ff" stroke-opacity=".3" stroke-width="1.5"/>
+      <circle cx="130" cy="262" r="26" stroke="#64d2ff" stroke-width="2" stroke-dasharray="7 5" stroke-opacity=".75"/>
+      <path d="M130 240v12M130 272v12M114 262h12M142 262h12" stroke="#64d2ff" stroke-width="2" stroke-opacity=".75"/>
+      <path d="M100 250 L 104 246 M160 250 L 156 246" stroke="#64d2ff" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="stage-char stage-op parallax" data-speed="0.09">
+    <svg viewBox="0 0 260 320" fill="none">
+      <defs>
+        <linearGradient id="so-body" x1="130" y1="20" x2="130" y2="310" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#27302a"/>
+          <stop offset="1" stop-color="#0b0e0c"/>
+        </linearGradient>
+        <radialGradient id="so-aura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(130 238) scale(130)">
+          <stop stop-color="#9ab86a" stop-opacity=".28"/>
+          <stop offset="1" stop-color="#9ab86a" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="130" cy="238" r="130" fill="url(#so-aura)"/>
+      <path d="M130 44 C 92 44 72 92 72 178 L 72 224 L 188 224 L 188 178 C 188 92 168 44 130 44 Z" fill="url(#so-body)"/>
+      <path d="M92 82 L 168 82 L 168 118 L 92 118 Z" fill="#171c22"/>
+      <path d="M82 84 C 70 102 70 124 82 134 L 82 84 Z" fill="#232a31"/>
+      <path d="M178 84 C 190 102 190 124 178 134 L 178 84 Z" fill="#232a31"/>
+      <path d="M96 94 L 164 94 L 164 112 L 96 112 Z" fill="#0c1118"/>
+      <path d="M96 98 L 164 98" stroke="#9ab86a" stroke-width="2.5" stroke-opacity=".9"/>
+      <path d="M116 138 L 144 138 L 150 152 L 138 152 L 138 196 L 122 196 L 122 152 L 110 152 Z" fill="#14181d"/>
+      <path d="M64 226 C 64 198 82 182 104 178 L 104 226 Z" fill="#1d2320"/>
+      <path d="M196 226 C 196 198 178 182 156 178 L 156 226 Z" fill="#1d2320"/>
+      <path d="M116 150 L 144 150" stroke="#9ab86a" stroke-width="2" stroke-opacity=".8"/>
+      <path d="M92 238 L 168 238 M88 246 L 172 246" stroke="rgba(255,255,255,.25)" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="stage-grid"></div>
+  <div class="stage-vignette"></div>
+  <div class="stage-tag stage-tag-l">星穹法师 · 峡谷中路</div>
+  <div class="stage-tag stage-tag-r">突击兵 · 先遣小队</div>
+</div>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">Peak<span>代练</span></a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#roster">英雄</a>
+      <a href="#process">流程</a>
+      <a href="#services">服务</a>
+      <a href="#pricing">价格</a>
+      <a href="#orders">订单</a>
+      <a href="#faq">常见问题</a>
+    </nav>
+    <button class="btn btn-primary btn-small" data-open-sheet>预约代练</button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-panel">
+      <div class="hero-content">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="profile-card profile-1 parallax" data-speed="0.05" aria-hidden="true">
+      <div class="pc-top">
+        <div class="pc-icon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round">
+            <circle cx="24" cy="24" r="15"/>
+            <path d="M24 14l4 8 8 1-6 6 2 9-8-4-8 4 2-9-6-6 8-1z" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="pc-name">星穹法师</div>
+          <div class="pc-role">法师 · 中单 · 爆发</div>
+        </div>
+      </div>
+      <div class="pc-stats">
+        <div><div class="pc-stat"><span>攻击</span><span>88</span></div><div class="pc-bar"><i style="width:88%"></i></div></div>
+        <div><div class="pc-stat"><span>生存</span><span>42</span></div><div class="pc-bar"><i style="width:42%"></i></div></div>
+      </div>
+    </div>
+    <div class="profile-card profile-2 parallax" data-speed="0.08" aria-hidden="true">
+      <div class="pc-top">
+        <div class="pc-icon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round">
+            <path d="M14 26h20v7H14z"/>
+            <path d="M34 24h9v11h-9z"/>
+            <path d="M18 20h6v6h-6z"/>
+            <path d="M12 33h24v3H12z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="pc-name">突击兵</div>
+          <div class="pc-role">三角洲 · 近距离压制</div>
+        </div>
+      </div>
+      <div class="pc-stats">
+        <div><div class="pc-stat"><span>火力</span><span>85</span></div><div class="pc-bar"><i style="width:85%"></i></div></div>
+        <div><div class="pc-stat"><span>机动</span><span>70</span></div><div class="pc-bar"><i style="width:70%"></i></div></div>
+      </div>
+    </div>
+    <div class="minimap parallax" data-speed="0.12" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none">
+        <rect class="mm-frame" x="0.5" y="0.5" width="99" height="99" rx="10" stroke-width="1"/>
+        <path class="mm-lane" d="M8 8 C 30 22, 34 46, 50 50 C 66 54, 70 78, 92 92" stroke-width="2" stroke-linecap="round"/>
+        <path class="mm-lane" d="M92 8 C 70 22, 66 46, 50 50 C 34 54, 30 78, 8 92" stroke-width="2" stroke-linecap="round"/>
+        <path class="mm-lane" d="M50 4v10M50 86v10M4 50h10M86 50h10" stroke-width="1.2" stroke-linecap="round"/>
+        <circle class="mm-player" cx="50" cy="50" r="3"/>
+        <circle cx="28" cy="24" r="3" fill="#34c759"/>
+        <circle cx="72" cy="26" r="3" fill="#34c759"/>
+        <circle cx="30" cy="76" r="3" fill="#ff453a"/>
+        <circle cx="72" cy="74" r="3" fill="#ff453a"/>
+      </svg>
+      <span class="mm-label">峡谷 · 实时战况</span>
+    </div>
+    <p class="eyebrow">王者荣耀 · 英雄联盟 · 和平精英 · 原神</p>
+    <h1 class="display">段位，不该<br>消耗你的夜晚。</h1>
+    <p class="hero-sub">真人大师代练与陪练，战绩全程可查、随时可暂停，透明报价，安全护航。上分这件事，交给专注的人。</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" data-open-sheet>立即预约</button>
+      <a class="btn btn-ghost" href="#pricing">查看价格</a>
+    </div>
+    <div class="hot-strip" aria-label="热门内容">
+      <span class="hot-tag"><b>#</b> 峡谷 5v5</span>
+      <span class="hot-tag"><b>#</b> 巅峰赛</span>
+      <span class="hot-tag"><b>#</b> 大战场 64v64</span>
+      <span class="hot-tag"><b>#</b> 撤离模式</span>
+      <span class="hot-tag"><b>#</b> 团战之夜</span>
+      <span class="hot-tag"><b>#</b> 开放世界</span>
+      <span class="hot-tag"><b>#</b> 吃鸡模式</span>
+    </div>
+
+    <div class="hero-card glass" id="heroCard">
+      <div class="hud-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="hc-top">
+        <div class="hc-title">当前订单 · 王者荣耀 星耀Ⅰ → 王者</div>
+        <span class="hc-pill">● 代练中</span>
+      </div>
+      <div class="hc-progress">
+        <div class="hc-progress-row"><span>总进度</span><b id="progressText">0%</b></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="hc-grid">
+        <div class="hc-cell"><small>本日战绩</small><b>6 胜 1 负 · 胜率 86%</b></div>
+        <div class="hc-cell"><small>预计剩余</small><b>3 小时 12 分</b></div>
+        <div class="hc-cell"><small>代练分段</small><b>巅峰赛 2100+</b></div>
+        <div class="hc-cell"><small>安全保障</small><b>战绩全程可查</b></div>
+      </div>
+      <div class="hc-actions">
+        <button class="btn btn-ghost btn-small">暂停订单</button>
+        <button class="btn btn-primary btn-small">查看实时战绩</button>
+      </div>
+      <div class="hc-chip hc-chip-1"><span class="chip-dot green"></span>+120 积分已到账</div>
+      <div class="hc-chip hc-chip-2"><span class="chip-dot blue"></span>连胜 ×5</div>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item"><div class="trust-num">4.9</div><div class="trust-label">平均好评分</div></div>
+      <div class="trust-item"><div class="trust-num">12,000+</div><div class="trust-label">已完成订单</div></div>
+      <div class="trust-item"><div class="trust-num">96%</div><div class="trust-label">准时交付率</div></div>
+      <div class="trust-item"><div class="trust-num">24h</div><div class="trust-label">在线客服</div></div>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="roster">
+    <div class="section-head">
+      <p class="section-kicker">ROSTER</p>
+      <h2 class="section-title">热门游戏里的英雄与干员</h2>
+      <p class="section-sub">王者荣耀风格的英雄档案 × 三角洲行动风格的作战简报，示意图均为原创。</p>
+    </div>
+    <div class="roster-grid">
+      <article class="roster-card" data-type="moba">
+        <div class="roster-art">
+          <span class="roster-tag">法师 · 爆发</span>
+          <svg viewBox="0 0 180 220" fill="none">
+            <defs>
+              <linearGradient id="rm-body" x1="90" y1="20" x2="90" y2="200" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#1d2a4d"/>
+                <stop offset="1" stop-color="#0a0e1a"/>
+              </linearGradient>
+              <radialGradient id="rm-aura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(90 168) scale(78)">
+                <stop stop-color="#64d2ff" stop-opacity=".30"/>
+                <stop offset="1" stop-color="#64d2ff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="90" cy="168" r="78" fill="url(#rm-aura)"/>
+            <path d="M126 30 L126 150" stroke="#7fb4ff" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="126" cy="22" r="12" fill="#64d2ff"/>
+            <circle cx="126" cy="22" r="19" stroke="#64d2ff" stroke-opacity=".35" stroke-width="1.5"/>
+            <path d="M90 40 C 58 40 40 78 40 160 L 140 160 C 140 78 122 40 90 40 Z" fill="url(#rm-body)"/>
+            <path d="M90 30 C 72 30 62 54 62 70 C 72 60 84 56 90 66 C 96 56 108 60 118 70 C 118 54 108 30 90 30 Z" fill="#070b14"/>
+            <path d="M80 62 Q 90 76 100 62 Q 90 88 80 62" fill="#ffd97a" fill-opacity=".92"/>
+            <path d="M48 152 C 64 122 78 112 90 112 C 102 112 116 122 132 152 Z" fill="#64d2ff" fill-opacity=".08" stroke="#64d2ff" stroke-opacity=".3" stroke-width="1.2"/>
+            <circle cx="90" cy="184" r="19" stroke="#64d2ff" stroke-width="1.5" stroke-dasharray="6 4" stroke-opacity=".75"/>
+            <path d="M90 170v9M90 189v9M78 184h9M102 184h9" stroke="#64d2ff" stroke-width="1.5" stroke-opacity=".75"/>
+          </svg>
+        </div>
+        <div class="roster-kicker">王者荣耀 · 英雄档案</div>
+        <h3>星穹法师</h3>
+        <p class="roster-desc">爆发型中单，掌控雷电，一套技能清线。</p>
+        <div class="roster-stats">
+          <div><div class="roster-stat"><span>攻击</span><span>88</span></div><div class="roster-bar"><i style="width:88%"></i></div></div>
+          <div><div class="roster-stat"><span>生存</span><span>42</span></div><div class="roster-bar"><i style="width:42%"></i></div></div>
+          <div><div class="roster-stat"><span>难度</span><span>55</span></div><div class="roster-bar"><i style="width:55%"></i></div></div>
+        </div>
+      </article>
+      <article class="roster-card" data-type="moba">
+        <div class="roster-art">
+          <span class="roster-tag">刺客 · 突进</span>
+          <svg viewBox="0 0 180 220" fill="none">
+            <defs>
+              <linearGradient id="ra-body" x1="90" y1="20" x2="90" y2="200" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#241c3d"/>
+                <stop offset="1" stop-color="#0a0812"/>
+              </linearGradient>
+              <radialGradient id="ra-aura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(90 170) scale(82)">
+                <stop stop-color="#b78cff" stop-opacity=".30"/>
+                <stop offset="1" stop-color="#b78cff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="90" cy="170" r="82" fill="url(#ra-aura)"/>
+            <path d="M90 38 C 56 38 40 76 40 158 L 140 158 C 140 76 124 38 90 38 Z" fill="url(#ra-body)"/>
+            <path d="M90 26 C 74 26 66 48 66 62 C 76 54 84 50 90 60 C 96 50 104 54 114 62 C 114 48 106 26 90 26 Z" fill="#08070d"/>
+            <path d="M72 56 Q 90 74 108 56 Q 90 82 72 56" fill="#ff9ad5" fill-opacity=".9"/>
+            <path d="M42 128 L 70 108 L 58 140 Z" fill="#b78cff"/>
+            <path d="M138 128 L 110 108 L 122 140 Z" fill="#b78cff"/>
+            <path d="M46 130 L 60 118 M134 130 L 120 118" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-opacity=".75"/>
+            <path d="M90 186 L 96 198 L 90 210 L 84 198 Z" fill="#b78cff" fill-opacity=".8"/>
+          </svg>
+        </div>
+        <div class="roster-kicker">王者荣耀 · 英雄档案</div>
+        <h3>影刃刺客</h3>
+        <p class="roster-desc">突进收割型打野，绕后切入，一击致命。</p>
+        <div class="roster-stats">
+          <div><div class="roster-stat"><span>攻击</span><span>92</span></div><div class="roster-bar"><i style="width:92%"></i></div></div>
+          <div><div class="roster-stat"><span>生存</span><span>38</span></div><div class="roster-bar"><i style="width:38%"></i></div></div>
+          <div><div class="roster-stat"><span>难度</span><span>70</span></div><div class="roster-bar"><i style="width:70%"></i></div></div>
+        </div>
+      </article>
+      <article class="roster-card" data-type="op">
+        <div class="roster-art">
+          <span class="roster-tag">突击 · 压制</span>
+          <svg viewBox="0 0 180 220" fill="none">
+            <defs>
+              <linearGradient id="ro-body" x1="90" y1="20" x2="90" y2="200" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#27302a"/>
+                <stop offset="1" stop-color="#0b0e0c"/>
+              </linearGradient>
+              <radialGradient id="ro-aura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(90 168) scale(80)">
+                <stop stop-color="#9ab86a" stop-opacity=".28"/>
+                <stop offset="1" stop-color="#9ab86a" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="90" cy="168" r="80" fill="url(#ro-aura)"/>
+            <path d="M90 34 C 62 34 48 70 48 132 L 48 160 L 132 160 L 132 132 C 132 70 118 34 90 34 Z" fill="url(#ro-body)"/>
+            <path d="M62 62 L 118 62 L 118 88 L 62 88 Z" fill="#171c22"/>
+            <path d="M55 64 C 47 76 47 91 55 98 L 55 64 Z" fill="#232a31"/>
+            <path d="M125 64 C 133 76 133 91 125 98 L 125 64 Z" fill="#232a31"/>
+            <path d="M66 71 L 114 71 L 114 83 L 66 83 Z" fill="#0c1118"/>
+            <path d="M66 74 L 114 74" stroke="#9ab86a" stroke-width="2" stroke-opacity=".9"/>
+            <path d="M80 102 L 100 102 L 104 112 L 96 112 L 96 140 L 84 140 L 84 112 L 76 112 Z" fill="#14181d"/>
+            <path d="M44 162 C 44 142 57 130 72 128 L 72 162 Z" fill="#1d2320"/>
+            <path d="M136 162 C 136 142 123 130 108 128 L 108 162 Z" fill="#1d2320"/>
+            <path d="M80 110 L 100 110" stroke="#9ab86a" stroke-width="1.5" stroke-opacity=".8"/>
+          </svg>
+        </div>
+        <div class="roster-kicker">三角洲行动 · 作战干员</div>
+        <h3>突击兵</h3>
+        <p class="roster-desc">近距离火力压制，突破防线首选。</p>
+        <div class="roster-stats">
+          <div><div class="roster-stat"><span>火力</span><span>85</span></div><div class="roster-bar"><i style="width:85%"></i></div></div>
+          <div><div class="roster-stat"><span>机动</span><span>70</span></div><div class="roster-bar"><i style="width:70%"></i></div></div>
+          <div><div class="roster-stat"><span>防护</span><span>60</span></div><div class="roster-bar"><i style="width:60%"></i></div></div>
+        </div>
+      </article>
+      <article class="roster-card" data-type="op">
+        <div class="roster-art">
+          <span class="roster-tag">医疗 · 支援</span>
+          <svg viewBox="0 0 180 220" fill="none">
+            <defs>
+              <linearGradient id="rd-body" x1="90" y1="20" x2="90" y2="200" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#25302a"/>
+                <stop offset="1" stop-color="#0a0e0c"/>
+              </linearGradient>
+              <radialGradient id="rd-aura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(90 168) scale(80)">
+                <stop stop-color="#9ab86a" stop-opacity=".26"/>
+                <stop offset="1" stop-color="#9ab86a" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="90" cy="168" r="80" fill="url(#rd-aura)"/>
+            <path d="M90 34 C 62 34 48 70 48 132 L 48 160 L 132 160 L 132 132 C 132 70 118 34 90 34 Z" fill="url(#rd-body)"/>
+            <path d="M62 62 L 118 62 L 118 88 L 62 88 Z" fill="#171c22"/>
+            <path d="M55 64 C 47 76 47 91 55 98 L 55 64 Z" fill="#232a31"/>
+            <path d="M125 64 C 133 76 133 91 125 98 L 125 64 Z" fill="#232a31"/>
+            <path d="M66 71 L 114 71 L 114 83 L 66 83 Z" fill="#0c1118"/>
+            <path d="M84 71 h12 v4 h6 v8 h-6 v4 h-12 v-4 h-6 v-8 h6 z" fill="#fff" fill-opacity=".92"/>
+            <path d="M72 104 L 108 104 L 112 116 L 104 116 L 104 142 L 76 142 L 76 116 L 68 116 Z" fill="#14181d"/>
+            <path d="M80 122 L 100 122 M80 128 L 100 128 M80 134 L 100 134" stroke="#9ab86a" stroke-width="2" stroke-opacity=".75"/>
+            <path d="M44 162 C 44 142 57 130 72 128 L 72 162 Z" fill="#1d2320"/>
+            <path d="M136 162 C 136 142 123 130 108 128 L 108 162 Z" fill="#1d2320"/>
+          </svg>
+        </div>
+        <div class="roster-kicker">三角洲行动 · 作战干员</div>
+        <h3>医疗兵</h3>
+        <p class="roster-desc">战场支援核心，拉人救场、保障续航。</p>
+        <div class="roster-stats">
+          <div><div class="roster-stat"><span>治疗</span><span>95</span></div><div class="roster-bar"><i style="width:95%"></i></div></div>
+          <div><div class="roster-stat"><span>机动</span><span>55</span></div><div class="roster-bar"><i style="width:55%"></i></div></div>
+          <div><div class="roster-stat"><span>防护</span><span>65</span></div><div class="roster-bar"><i style="width:65%"></i></div></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="process">
+    <div class="section-head">
+      <p class="section-kicker">HOW IT WORKS</p>
+      <h2 class="section-title">四步，把上分交给专业的人</h2>
+      <p class="section-sub">从下单到验收全程透明，你可以随时查看进度、暂停或终止。</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>选择服务</h3>
+        <p>选游戏、当前段位与目标段位，系统实时估算价格与时长。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>客服确认</h3>
+        <p>专属客服核对账号条件与目标，确认无风险后开始接单。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>大师开打</h3>
+        <p>同分段大神全程代练，实时同步战绩，进度看得见。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>验收付款</h3>
+        <p>到达目标段位、你确认战绩满意后再支付，售后 7 天保障。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="services">
+    <div class="section-head">
+      <p class="section-kicker">SERVICES</p>
+      <h2 class="section-title">按你的需求选择</h2>
+      <p class="section-sub">冲分、陪练还是成就补全，价格公开，无隐藏收费。</p>
+    </div>
+    <div class="cards">
+      <article class="service">
+        <div class="service-icon">🎯</div>
+        <h3>排位冲分</h3>
+        <div class="service-price">¥18 / 颗星起</div>
+        <ul>
+          <li>指定英雄或位置代练</li>
+          <li>连败保护，状态实时同步</li>
+          <li>掉星包赔，免费补回</li>
+        </ul>
+      </article>
+      <article class="service">
+        <div class="service-icon">⚡</div>
+        <h3>巅峰赛上分</h3>
+        <div class="service-price">¥60 / 场起</div>
+        <ul>
+          <li>高分段大神执机</li>
+          <li>每场结束立即反馈</li>
+          <li>可指定阵容与打法</li>
+        </ul>
+      </article>
+      <article class="service">
+        <div class="service-icon">🎮</div>
+        <h3>双排陪练</h3>
+        <div class="service-price">¥28 / 小时</div>
+        <ul>
+          <li>边打边教，复盘讲解</li>
+          <li>语音连麦指导思路</li>
+          <li>适合新手快速上手</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="section-head">
+      <p class="section-kicker">PRICING</p>
+      <h2 class="section-title">透明的价格，没有惊喜</h2>
+      <p class="section-sub">所有套餐都包含全程进度同步与售后保障。</p>
+    </div>
+    <div class="plans">
+      <article class="plan">
+        <div class="plan-name">快速上分</div>
+        <div class="plan-desc">适合距离目标只差一步</div>
+        <div class="plan-price">¥88<small> / 3 颗星</small></div>
+        <ul>
+          <li>星耀及以下分段</li>
+          <li>24 小时内开始</li>
+          <li>战绩实时可查</li>
+        </ul>
+        <button class="btn btn-ghost" data-open-sheet>选择套餐</button>
+      </article>
+      <article class="plan plan-popular">
+        <div class="plan-badge">最受欢迎</div>
+        <div class="plan-name">全段上分</div>
+        <div class="plan-desc">从当前段位一路打到目标</div>
+        <div class="plan-price">¥399<small> / 包段</small></div>
+        <ul>
+          <li>全分段通用</li>
+          <li>优先安排大师执机</li>
+          <li>掉段免费补回</li>
+          <li>7 天售后保障</li>
+        </ul>
+        <button class="btn btn-primary" data-open-sheet>选择套餐</button>
+      </article>
+      <article class="plan">
+        <div class="plan-name">赛季陪玩</div>
+        <div class="plan-desc">整个赛季的专属教练</div>
+        <div class="plan-price">¥999<small> / 赛季</small></div>
+        <ul>
+          <li>不限次双排陪练</li>
+          <li>每周一次深度复盘</li>
+          <li>专属教练微信直连</li>
+        </ul>
+        <button class="btn btn-ghost" data-open-sheet>选择套餐</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <p class="section-kicker">REVIEWS</p>
+      <h2 class="section-title">已经有人把夜晚还给了自己</h2>
+    </div>
+    <div class="quotes">
+      <figure class="quote">
+        <p>「上周从星耀二打到王者，全程战绩都能看到，比我自己打还稳。中途暂停了一次，客服秒回。」</p>
+        <figcaption class="quote-who">
+          <span class="avatar">林</span>
+          <span><span class="quote-name">林同学</span><br><span class="quote-meta">王者荣耀 · 包段上分</span></span>
+        </figcaption>
+      </figure>
+      <figure class="quote">
+        <p>「陪练是真的边打边讲，一个月从铂金打到钻石，现在自己单排也不慌了。值。」</p>
+        <figcaption class="quote-who">
+          <span class="avatar">陈</span>
+          <span><span class="quote-name">陈晚</span><br><span class="quote-meta">英雄联盟 · 赛季陪玩</span></span>
+        </figcaption>
+      </figure>
+      <figure class="quote">
+        <p>「最怕账号出问题，下单前客服把风险讲得很清楚，全程没改过密码之外的任何设置，很专业。」</p>
+        <figcaption class="quote-who">
+          <span class="avatar">王</span>
+          <span><span class="quote-name">老王</span><br><span class="quote-meta">和平精英 · 巅峰赛</span></span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="section-head">
+      <p class="section-kicker">FAQ</p>
+      <h2 class="section-title">常见问题</h2>
+    </div>
+    <div class="faq">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq1">
+          代练安全吗？账号会不会被封？
+          <svg class="faq-chev" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a" id="faq1"><div class="faq-a-inner">我们使用固定设备、固定网络与合规分段执机，模拟真人操作节奏。但请注意：任何代练都存在违反游戏用户协议的风险，下单前客服会逐条告知，并由你确认是否接受。</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq2">
+          中途可以暂停或终止吗？
+          <svg class="faq-chev" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a" id="faq2"><div class="faq-a-inner">可以。随时可暂停，最长保留 72 小时；超过后如需继续，客服会重新确认账号状态。未完成部分按比例退款。</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq3">
+          掉星了怎么办？
+          <svg class="faq-chev" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a" id="faq3"><div class="faq-a-inner">套餐内掉星免费补回，不额外收费。单局异常（网络、匹配故障）会先沟通再继续，进度以你确认的截图为准。</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq4">
+          付款方式有哪些？
+          <svg class="faq-chev" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a" id="faq4"><div class="faq-a-inner">支持微信、支付宝与平台担保交易。推荐担保模式：验收战绩满意后，再由平台结算给代练方。</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="orders">
+    <div class="section-head">
+      <p class="section-kicker">ORDERS</p>
+      <h2 class="section-title">我的订单</h2>
+      <p class="section-sub">输入下单时填写的联系方式，实时查询订单状态。</p>
+    </div>
+    <div class="orders-box">
+      <div class="orders-search">
+        <input id="orderContact" type="text" placeholder="微信 / QQ / 手机号" autocomplete="off">
+        <button class="btn btn-primary" id="orderSearch">查询订单</button>
+      </div>
+      <div class="order-list" id="orderList"></div>
+      <p class="orders-empty" id="orderEmpty" hidden>还没有查到订单，试试下单时填写的联系方式。</p>
+      <p class="orders-hint">订单数据保存在本机服务器的 orders.json 文件中，仅用于演示真实提交流程。</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">Peak<span>代练</span></div>
+      <nav class="footer-links" style="margin-top:10px">
+        <a href="#top">返回顶部</a>
+        <a href="/admin">管理后台</a>
+      </nav>
+    </div>
+    <p class="footer-note">请遵守游戏用户协议与当地法律法规。代练服务存在账号风险，下单前请仔细阅读并确认风险条款。未成年人禁止下单。本页为演示服务，订单会真实写入同目录数据库（orders.db），请勿填写真实敏感信息。</p>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" inert>
+  <div class="sheet-handle" id="sheetHandle" aria-hidden="true"><span></span></div>
+  <div class="sheet-body">
+    <div class="sheet-title-row">
+      <h2 class="sheet-title" id="sheetTitle">预约代练</h2>
+      <button class="sheet-close" id="sheetClose" aria-label="关闭">✕</button>
+    </div>
+    <form id="orderForm" novalidate>
+      <div class="field">
+        <label>选择游戏</label>
+        <div class="chips">
+          <label><input type="radio" name="game" value="王者荣耀" checked><span>王者荣耀</span></label>
+          <label><input type="radio" name="game" value="英雄联盟"><span>英雄联盟</span></label>
+          <label><input type="radio" name="game" value="和平精英"><span>和平精英</span></label>
+          <label><input type="radio" name="game" value="原神"><span>原神</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="service">选择服务</label>
+        <select id="service" name="service">
+          <option>排位冲分</option>
+          <option>巅峰赛上分</option>
+          <option>双排陪练</option>
+          <option>赛季陪玩</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="currentRank">当前段位</label>
+        <input id="currentRank" name="currentRank" type="text" placeholder="例如：星耀Ⅰ">
+      </div>
+      <div class="field">
+        <label for="targetRank">目标段位</label>
+        <input id="targetRank" name="targetRank" type="text" placeholder="例如：王者 20 星">
+      </div>
+      <div class="field">
+        <label for="contact">联系方式（微信 / QQ）</label>
+        <input id="contact" name="contact" type="text" placeholder="客服将通过它联系你" autocomplete="off">
+        <span class="error" id="contactError" hidden>请填写联系方式，方便客服确认订单。</span>
+      </div>
+      <span class="error" id="formError" hidden></span>
+      <button class="btn btn-primary" type="submit" style="width:100%">提交预约</button>
+      <p class="form-note">提交即表示你已阅读并同意风险条款。客服将在 10 分钟内与你联系确认。</p>
+    </form>
+    <div class="order-success" id="orderSuccess" hidden>
+      <div class="os-icon">✓</div>
+      <h3>订单提交成功</h3>
+      <p>订单号 <b id="osNo"></b></p>
+      <p>当前状态：<b id="osStatus">待确认</b>，专属客服将在 10 分钟内联系你。</p>
+      <div class="os-actions">
+        <button class="btn btn-ghost btn-small" id="osAgain">再下一单</button>
+        <button class="btn btn-primary btn-small" id="osClose">完成</button>
+      </div>
+      <p class="os-note">也可以到页面底部「我的订单」输入联系方式实时查询。</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Tiny spring engine ---------- */
+  const springs = [];
+  function springStep(s, dt, stiffness, damping) {
+    const a = (s.target - s.x) * stiffness - s.v * damping;
+    s.v += a * dt;
+    s.x += s.v * dt;
+  }
+  function runSpring(s, target, opts) {
+    opts = opts || {};
+    s.target = target;
+    s.stiffness = opts.stiffness || 180;
+    s.damping = opts.damping || 24;
+    s.precision = opts.precision || 0.5;
+    s.onUpdate = opts.onUpdate || null;
+    s.onDone = opts.onDone || null;
+    if (opts.velocity !== undefined) s.v = opts.velocity;
+    if (!springs.includes(s)) springs.push(s);
+    if (springs.length === 1) requestAnimationFrame(tick);
+  }
+  function cancelSpring(s) {
+    const i = springs.indexOf(s);
+    if (i >= 0) springs.splice(i, 1);
+  }
+  let last = performance.now();
+  function tick(now) {
+    const dt = Math.min(0.033, (now - last) / 1000);
+    last = now;
+    for (const s of springs.slice()) {
+      springStep(s, dt, s.stiffness, s.damping);
+      if (s.onUpdate) s.onUpdate(s.x, s.v);
+      if (Math.abs(s.target - s.x) < s.precision && Math.abs(s.v) < 1) {
+        s.x = s.target; s.v = 0;
+        springs.splice(springs.indexOf(s), 1);
+        if (s.onDone) s.onDone();
+      }
+    }
+    if (springs.length) requestAnimationFrame(tick);
+  }
+
+  /* ---------- Nav shadow on scroll ---------- */
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', function () {
+    nav.classList.toggle('scrolled', scrollY > 12);
+  }, { passive: true });
+
+  /* ---------- Background glyph parallax ---------- */
+  const parallaxEls = document.querySelectorAll('.glyph, .parallax');
+  if (!reduceMotion && parallaxEls.length) {
+    const glyphs = Array.from(parallaxEls).map(function (el) {
+      return {
+        el: el,
+        speed: parseFloat(el.getAttribute('data-speed') || '0.05'),
+        rotate: parseFloat(el.getAttribute('data-rotate') || '0')
+      };
+    });
+    let waiting = false;
+    addEventListener('scroll', function () {
+      if (waiting) return;
+      waiting = true;
+      requestAnimationFrame(function () {
+        const y = scrollY;
+        glyphs.forEach(function (g) {
+          g.el.style.transform = 'translate3d(0, ' + (y * g.speed).toFixed(1) + 'px, 0) rotate(' + g.rotate + 'deg)';
+        });
+        waiting = false;
+      });
+    }, { passive: true });
+  }
+
+  /* ---------- Hero card tilt (spring-driven) ---------- */
+  const heroCard = document.getElementById('heroCard');
+  if (heroCard && !reduceMotion) {
+    const tilt = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0 };
+    heroCard.addEventListener('pointermove', function (e) {
+      const r = heroCard.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      tilt.ty = px * 9;
+      tilt.tx = -py * 9;
+    });
+    heroCard.addEventListener('pointerleave', function () {
+      tilt.tx = 0; tilt.ty = 0;
+    });
+    (function tiltLoop(now) {
+      const dt = Math.min(0.033, (now - (tiltLoop._last || now)) / 1000);
+      tiltLoop._last = now;
+      const ax = (tilt.tx - tilt.x) * 160 - tilt.vx * 24;
+      const ay = (tilt.ty - tilt.y) * 160 - tilt.vy * 24;
+      tilt.vx += ax * dt; tilt.x += tilt.vx * dt;
+      tilt.vy += ay * dt; tilt.y += tilt.vy * dt;
+      heroCard.style.transform =
+        'perspective(1000px) rotateX(' + tilt.x.toFixed(3) + 'deg) rotateY(' + tilt.y.toFixed(3) + 'deg)';
+      requestAnimationFrame(tiltLoop);
+    })(performance.now());
+  }
+
+  /* ---------- Progress bar (spring to 62%) ---------- */
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  if (progressFill) {
+    if (reduceMotion) {
+      progressFill.style.width = '62%';
+      progressText.textContent = '62%';
+    } else {
+      runSpring({ x: 0, v: 0 }, 62, {
+        stiffness: 90, damping: 26, precision: 0.2,
+        onUpdate: function (x) {
+          progressFill.style.width = x.toFixed(2) + '%';
+          progressText.textContent = Math.round(x) + '%';
+        }
+      });
+    }
+  }
+
+  /* ---------- Bottom sheet ---------- */
+  const sheet = document.getElementById('sheet');
+  const scrim = document.getElementById('scrim');
+  const handle = document.getElementById('sheetHandle');
+  const closeBtn = document.getElementById('sheetClose');
+  const sheetSpring = { x: 0, v: 0 };
+  let sheetHeight = 0;
+  let sheetOpen = false;
+  let drag = null;
+
+  function rubberband(overshoot, dimension, constant) {
+    constant = constant || 0.55;
+    return (overshoot * dimension * constant) / (dimension + constant * Math.abs(overshoot));
+  }
+
+  function updateSheet(x, v) {
+    const progress = Math.min(1, Math.max(0, x / sheetHeight));
+    sheet.style.transform = 'translate3d(0, ' + x.toFixed(2) + 'px, 0)';
+    scrim.style.opacity = (1 - progress).toFixed(3);
+    scrim.style.pointerEvents = sheetOpen ? 'auto' : 'none';
+    sheet.style.visibility = progress >= 1 ? 'hidden' : 'visible';
+  }
+
+  function openSheet() {
+    sheetOpen = true;
+    sheet.removeAttribute('inert');
+    sheet.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('sheet-open');
+    sheetHeight = sheet.getBoundingClientRect().height || 560;
+    if (sheetSpring.x >= sheetHeight - 2) sheetSpring.x = sheetHeight;
+    if (reduceMotion) {
+      sheetSpring.x = 0;
+      sheetSpring.v = 0;
+      updateSheet(0, 0);
+      scrim.style.opacity = 1;
+      return;
+    }
+    runSpring(sheetSpring, 0, {
+      stiffness: 320, damping: 32, precision: 0.8,
+      onUpdate: updateSheet
+    });
+  }
+
+  function closeSheet() {
+    sheetOpen = false;
+    if (reduceMotion) {
+      cancelSpring(sheetSpring);
+      sheetSpring.x = sheetHeight;
+      sheetSpring.v = 0;
+      updateSheet(sheetHeight, 0);
+      sheet.setAttribute('inert', '');
+      sheet.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('sheet-open');
+      return;
+    }
+    runSpring(sheetSpring, sheetHeight, {
+      stiffness: 300, damping: 30, precision: 0.8,
+      onUpdate: updateSheet,
+      onDone: function () {
+        sheet.setAttribute('inert', '');
+        sheet.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('sheet-open');
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-open-sheet]').forEach(function (btn) {
+    btn.addEventListener('click', openSheet);
+  });
+  scrim.addEventListener('click', closeSheet);
+  closeBtn.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheetOpen) closeSheet();
+  });
+
+  /* Drag to dismiss: 1:1 tracking, rubber band, velocity handoff */
+  handle.addEventListener('pointerdown', function (e) {
+    if (reduceMotion || !sheetOpen) return;
+    handle.setPointerCapture(e.pointerId);
+    cancelSpring(sheetSpring);
+    const rect = sheet.getBoundingClientRect();
+    drag = {
+      startY: e.clientY,
+      startOffset: rect.top - (window.innerHeight - sheetHeight),
+      lastY: e.clientY,
+      lastT: performance.now(),
+      vel: 0
+    };
+    sheetSpring.v = 0;
+  });
+
+  handle.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    const now = performance.now();
+    const dt = Math.max(1, now - drag.lastT);
+    const dy = e.clientY - drag.lastY;
+    drag.vel = (dy / dt) * 1000 * 0.4 + drag.vel * 0.6;
+    drag.lastY = e.clientY;
+    drag.lastT = now;
+
+    let raw = drag.startOffset + (e.clientY - drag.startY);
+    let y;
+    if (raw > 0) {
+      y = rubberband(raw, sheetHeight);
+    } else {
+      y = -rubberband(-raw, Math.max(90, sheetHeight * 0.12));
+    }
+    sheetSpring.x = y;
+    sheetSpring.v = drag.vel;
+    updateSheet(y, drag.vel);
+  });
+
+  function endDrag(e) {
+    if (!drag) return;
+    handle.releasePointerCapture(e.pointerId);
+    const vel = drag.vel;
+    drag = null;
+    const threshold = sheetHeight * 0.35;
+    const goingUp = vel < -350;
+    if (sheetSpring.x > threshold && !goingUp) {
+      sheetOpen = false;
+      runSpring(sheetSpring, sheetHeight, {
+        stiffness: 300, damping: 26, precision: 0.8,
+        velocity: vel, onUpdate: updateSheet,
+        onDone: function () {
+          sheet.setAttribute('inert', '');
+          sheet.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('sheet-open');
+        }
+      });
+    } else {
+      sheetOpen = true;
+      runSpring(sheetSpring, 0, {
+        stiffness: 300, damping: 26, precision: 0.8,
+        velocity: vel, onUpdate: updateSheet
+      });
+    }
+  }
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+
+  /* ---------- FAQ accordion ---------- */
+  document.querySelectorAll('.faq-item').forEach(function (item) {
+    const btn = item.querySelector('.faq-q');
+    const answer = item.querySelector('.faq-a');
+    btn.addEventListener('click', function () {
+      const open = item.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+      answer.style.maxHeight = open ? answer.scrollHeight + 'px' : '0px';
+    });
+  });
+
+  /* ---------- Real order submission ---------- */
+  const form = document.getElementById('orderForm');
+  const contact = document.getElementById('contact');
+  const contactError = document.getElementById('contactError');
+  const formError = document.getElementById('formError');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const orderSuccess = document.getElementById('orderSuccess');
+  const osNo = document.getElementById('osNo');
+  const osStatus = document.getElementById('osStatus');
+  const osAgain = document.getElementById('osAgain');
+  const osClose = document.getElementById('osClose');
+  const toast = document.getElementById('toast');
+  let toastTimer = null;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toast.classList.remove('show');
+    }, 3200);
+  }
+
+  function showFormError(msg) {
+    formError.textContent = msg || '';
+    formError.hidden = !msg;
+  }
+
+  contact.addEventListener('input', function () {
+    contactError.hidden = true;
+    contact.classList.remove('invalid');
+    showFormError('');
+  });
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    showFormError('');
+    const gameInput = document.querySelector('input[name="game"]:checked');
+    const game = gameInput ? gameInput.value : '';
+    const service = document.getElementById('service').value.trim();
+    const currentRank = document.getElementById('currentRank').value.trim();
+    const targetRank = document.getElementById('targetRank').value.trim();
+    const contactValue = contact.value.trim();
+
+    if (!currentRank || !targetRank) {
+      showFormError('请填写当前段位和目标段位');
+      return;
+    }
+    if (!contactValue) {
+      contactError.hidden = false;
+      contact.classList.add('invalid');
+      contact.focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '提交中…';
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game: game,
+          service: service,
+          currentRank: currentRank,
+          targetRank: targetRank,
+          contact: contactValue
+        })
+      });
+      const data = await res.json().catch(function () { return null; });
+      if (!res.ok) {
+        if (data && data.fields && data.fields.contact) {
+          contactError.hidden = false;
+          contact.classList.add('invalid');
+        } else {
+          showFormError((data && data.error) || '提交失败，请稍后重试');
+        }
+        return;
+      }
+      if (data && data.order) {
+        osNo.textContent = data.order.order_no;
+        osStatus.textContent = data.order.status;
+        orderContact.value = contactValue;
+        form.hidden = true;
+        orderSuccess.hidden = false;
+        try { localStorage.setItem('peak_last_contact', contactValue); } catch (err) {}
+        showToast('订单 ' + data.order.order_no + ' 提交成功');
+      }
+    } catch (err) {
+      showFormError('提交失败：请通过本地服务器打开页面（运行 python order_server.py 后访问 http://localhost:8000）');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '提交预约';
+    }
+  });
+
+  function resetForm() {
+    form.reset();
+    form.hidden = false;
+    orderSuccess.hidden = true;
+    showFormError('');
+    contactError.hidden = true;
+    contact.classList.remove('invalid');
+  }
+
+  osAgain.addEventListener('click', resetForm);
+  osClose.addEventListener('click', function () {
+    resetForm();
+    closeSheet();
+  });
+
+  /* ---------- My orders ---------- */
+  const orderContact = document.getElementById('orderContact');
+  const orderSearch = document.getElementById('orderSearch');
+  const orderList = document.getElementById('orderList');
+  const orderEmpty = document.getElementById('orderEmpty');
+
+  function statusClass(status) {
+    if (status === '进行中') return 'doing';
+    if (status === '已完成') return 'done';
+    return 'confirm';
+  }
+
+  async function loadOrders() {
+    const value = orderContact.value.trim();
+    orderList.innerHTML = '';
+    if (!value) {
+      orderEmpty.textContent = '请输入联系方式再查询';
+      orderEmpty.hidden = false;
+      return;
+    }
+    orderSearch.disabled = true;
+    orderSearch.textContent = '查询中…';
+    try {
+      const res = await fetch('/api/orders?contact=' + encodeURIComponent(value));
+      const data = await res.json().catch(function () { return null; });
+      const orders = (data && data.orders) || [];
+      orderEmpty.hidden = orders.length > 0;
+      if (!orders.length) orderEmpty.textContent = '还没有查到订单，试试下单时填写的联系方式。';
+      orders.forEach(function (o) {
+        const item = document.createElement('div');
+        item.className = 'order-item';
+        const main = document.createElement('div');
+        main.className = 'order-item-main';
+        const b = document.createElement('b');
+        b.textContent = o.order_no;
+        const span = document.createElement('span');
+        span.textContent = (o.game || '') + ' · ' + (o.service || '') + ' · ' + (o.currentRank || '') + ' → ' + (o.targetRank || '') + ' · ' + (o.created_at || '');
+        main.appendChild(b);
+        main.appendChild(span);
+        const status = document.createElement('span');
+        status.className = 'order-status ' + statusClass(o.status);
+        status.textContent = o.status || '待确认';
+        item.appendChild(main);
+        item.appendChild(status);
+        orderList.appendChild(item);
+      });
+    } catch (err) {
+      orderEmpty.hidden = false;
+      orderEmpty.textContent = '查询失败：请确认页面由本地服务器打开（http://localhost:8000）';
+    } finally {
+      orderSearch.disabled = false;
+      orderSearch.textContent = '查询订单';
+    }
+  }
+
+  orderSearch.addEventListener('click', loadOrders);
+  orderContact.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') loadOrders();
+  });
+  try {
+    const last = localStorage.getItem('peak_last_contact');
+    if (last) orderContact.value = last;
+  } catch (err) {}
+})();
+</script>
+</body>
+</html>
