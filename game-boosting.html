@@ -363,6 +363,16 @@ section[id] { scroll-margin-top: 84px; }
   background: rgba(52, 199, 89, .14); padding: 5px 12px; border-radius: 999px;
   white-space: nowrap;
 }
+.hc-pill.confirm { color: #64d2ff; background: rgba(10, 132, 255, .14); }
+.hc-pill.doing { color: #ffd60a; background: rgba(255, 214, 10, .14); }
+.hc-pill.done { color: #34c759; background: rgba(52, 199, 89, .14); }
+.hc-pill.idle { color: #a1a1a6; background: rgba(255, 255, 255, .08); }
+.hc-live-dot {
+  width: 7px; height: 7px; border-radius: 50%; display: inline-block;
+  background: #ff453a; margin-right: 7px; vertical-align: 1px;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 .hc-progress { margin: 20px 0 16px; }
 .hc-progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 8px; }
 .hc-progress-row b { color: var(--text); font-weight: 600; }
@@ -377,6 +387,52 @@ section[id] { scroll-margin-top: 84px; }
 .hc-cell b { display: block; font-size: 14px; margin-top: 3px; font-weight: 600; }
 .hc-actions { display: flex; gap: 10px; margin-top: 20px; }
 .hc-actions .btn { flex: 1; padding: 10px 14px; font-size: 14px; }
+.hc-empty { text-align: center; padding: 14px 0 6px; color: var(--text2); font-size: 14px; }
+.hc-empty p { margin-bottom: 14px; }
+.hc-live-hint { font-size: 11px; color: rgba(245, 245, 247, .5); margin-top: 14px; text-align: center; }
+
+/* Games grid */
+.games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.game-tile {
+  padding: 22px 14px; border-radius: 22px; text-align: center;
+  background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
+  transition: transform .4s cubic-bezier(.21, 1.02, .35, 1), box-shadow .4s ease;
+  will-change: transform;
+}
+.game-tile:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+.game-icon {
+  width: 56px; height: 56px; margin: 0 auto 12px; border-radius: 18px;
+  display: grid; place-items: center; font-size: 26px;
+  background: linear-gradient(135deg, rgba(10, 132, 255, .16), rgba(100, 210, 255, .22));
+}
+.game-tile[data-accent="delta"] .game-icon { background: linear-gradient(135deg, rgba(154, 184, 106, .18), rgba(255, 255, 255, .05)); }
+.game-tile[data-accent="anime"] .game-icon { background: linear-gradient(135deg, rgba(255, 154, 213, .18), rgba(183, 140, 255, .2)); }
+.game-tile h3 { font-size: 15px; letter-spacing: -0.01em; }
+.game-tile p { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+/* Delta zone */
+.delta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.delta-card {
+  position: relative; padding: 30px 26px; border-radius: 24px;
+  background: var(--card); border: 1px solid rgba(154, 184, 106, .28); box-shadow: var(--shadow);
+  transition: transform .4s cubic-bezier(.21, 1.02, .35, 1), box-shadow .4s ease;
+  will-change: transform;
+}
+.delta-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+.delta-tag {
+  position: absolute; top: -12px; left: 22px; background: var(--mil); color: #0b0e0c;
+  font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  padding: 5px 13px; border-radius: 999px;
+}
+.delta-card .service-icon { background: linear-gradient(135deg, rgba(154, 184, 106, .2), rgba(255, 255, 255, .05)); }
+.delta-card .service-price { color: var(--mil); }
+.guarantee-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 24px; }
+.guarantee-item {
+  padding: 15px 10px; text-align: center; border-radius: 16px;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--border);
+  font-size: 12px; color: var(--text2); line-height: 1.5;
+}
+.guarantee-item b { display: block; color: var(--text); font-size: 13px; margin-bottom: 4px; }
 
 .trust-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 26px; }
 .trust-item {
@@ -485,7 +541,7 @@ section[id] { scroll-margin-top: 84px; }
 .service li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
 
 /* Pricing */
-.plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; align-items: start; }
 .plan {
   position: relative; padding: 32px 28px; border-radius: 26px;
   background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
@@ -692,6 +748,7 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
   .hero-card { transform: none !important; }
   .hero-card::after { animation: none; opacity: 0; }
   .hc-chip { animation: none; opacity: 1; }
+  .hc-live-dot { animation: none; }
 }
 @media (prefers-reduced-transparency: reduce) {
   .stage-char, .stage-tag { display: none; }
@@ -773,6 +830,7 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
       <a href="#roster">英雄</a>
       <a href="#process">流程</a>
       <a href="#services">服务</a>
+      <a href="#delta">三角洲</a>
       <a href="#pricing">价格</a>
       <a href="#orders">订单</a>
       <a href="#faq">常见问题</a>
@@ -838,7 +896,7 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
       </svg>
       <span class="mm-label">峡谷 · 实时战况</span>
     </div>
-    <p class="eyebrow">王者荣耀 · 英雄联盟 · 和平精英 · 原神</p>
+    <p class="eyebrow">王者荣耀 · 三角洲行动 · 英雄联盟 · 和平精英 · 原神 · 永劫无间</p>
     <h1 class="display">段位，不该<br>消耗你的夜晚。</h1>
     <p class="hero-sub">真人大师代练与陪练，战绩全程可查、随时可暂停，透明报价，安全护航。上分这件事，交给专注的人。</p>
     <div class="hero-cta">
@@ -858,23 +916,24 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
     <div class="hero-card glass" id="heroCard">
       <div class="hud-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
       <div class="hc-top">
-        <div class="hc-title">当前订单 · 王者荣耀 星耀Ⅰ → 王者</div>
-        <span class="hc-pill">● 代练中</span>
+        <div class="hc-title"><span class="hc-live-dot" aria-hidden="true"></span>实时订单</div>
+        <span class="hc-pill idle" id="liveStatus">暂无订单</span>
       </div>
-      <div class="hc-progress">
-        <div class="hc-progress-row"><span>总进度</span><b id="progressText">0%</b></div>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="hc-progress" id="liveProgressWrap">
+        <div class="hc-progress-row"><span>总进度</span><b id="liveProgressText">--</b></div>
+        <div class="progress-track"><div class="progress-fill" id="liveProgressFill"></div></div>
       </div>
       <div class="hc-grid">
-        <div class="hc-cell"><small>本日战绩</small><b>6 胜 1 负 · 胜率 86%</b></div>
-        <div class="hc-cell"><small>预计剩余</small><b>3 小时 12 分</b></div>
-        <div class="hc-cell"><small>代练分段</small><b>巅峰赛 2100+</b></div>
-        <div class="hc-cell"><small>安全保障</small><b>战绩全程可查</b></div>
+        <div class="hc-cell"><small>订单号</small><b id="liveNo">--</b></div>
+        <div class="hc-cell"><small>游戏 · 服务</small><b id="liveService">--</b></div>
+        <div class="hc-cell"><small>段位路线</small><b id="liveRanks">--</b></div>
+        <div class="hc-cell"><small>提交时间</small><b id="liveTime">--</b></div>
       </div>
-      <div class="hc-actions">
-        <button class="btn btn-ghost btn-small">暂停订单</button>
-        <button class="btn btn-primary btn-small">查看实时战绩</button>
+      <div class="hc-empty" id="liveEmpty" hidden>
+        <p>还没有进行中的订单，下一单随时开始</p>
+        <button class="btn btn-primary btn-small" data-open-sheet>立即预约</button>
       </div>
+      <p class="hc-live-hint">每 6 秒自动刷新 · 数据来自订单系统</p>
       <div class="hc-chip hc-chip-1"><span class="chip-dot green"></span>+120 积分已到账</div>
       <div class="hc-chip hc-chip-2"><span class="chip-dot blue"></span>连胜 ×5</div>
     </div>
@@ -886,6 +945,120 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
       <div class="trust-item"><div class="trust-num">24h</div><div class="trust-label">在线客服</div></div>
     </div>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="games">
+    <div class="section-head">
+      <p class="section-kicker">GAMES</p>
+      <h2 class="section-title">热门游戏全平台覆盖</h2>
+      <p class="section-sub">从峡谷到战场，从大世界到撤离点，都有对应的大神在等你。</p>
+    </div>
+    <div class="games-grid">
+      <div class="game-tile">
+        <div class="game-icon">🏯</div>
+        <h3>王者荣耀</h3>
+        <p>MOBA · 排位 / 巅峰赛</p>
+      </div>
+      <div class="game-tile" data-accent="delta">
+        <div class="game-icon">🎖️</div>
+        <h3>三角洲行动</h3>
+        <p>战术射击 · 护航 / 上分</p>
+      </div>
+      <div class="game-tile">
+        <div class="game-icon">🗡️</div>
+        <h3>英雄联盟</h3>
+        <p>MOBA · 排位 / 定位赛</p>
+      </div>
+      <div class="game-tile">
+        <div class="game-icon">🪂</div>
+        <h3>和平精英</h3>
+        <p>吃鸡 · 段位 / 陪玩</p>
+      </div>
+      <div class="game-tile" data-accent="anime">
+        <div class="game-icon">🌌</div>
+        <h3>原神</h3>
+        <p>开放世界 · 深渊 / 委托</p>
+      </div>
+      <div class="game-tile" data-accent="anime">
+        <div class="game-icon">⚔️</div>
+        <h3>永劫无间</h3>
+        <p>武侠竞技 · 排位 / 教学</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="delta">
+    <div class="section-head">
+      <p class="section-kicker">DELTA FORCE · 护航专区</p>
+      <h2 class="section-title">三角洲行动，撤离点有人接应</h2>
+      <p class="section-sub">烽火地带全装护航、大战场上分、撤离教学，掉装包赔，撤离不掉队。</p>
+    </div>
+    <div class="delta-grid">
+      <article class="delta-card">
+        <span class="delta-tag">三角洲行动</span>
+        <div class="service-icon">🛡️</div>
+        <h3 style="margin:18px 0 6px;font-size:19px;letter-spacing:-0.01em">烽火地带护航</h3>
+        <div class="service-price">¥38 / 局起</div>
+        <ul style="list-style:none;display:grid;gap:8px">
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 全装护送，地图点位引导</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 撤离点清场 + 安全撤离</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 掉装包赔，装备无忧</li>
+        </ul>
+      </article>
+      <article class="delta-card">
+        <span class="delta-tag">三角洲行动</span>
+        <div class="service-icon">🎯</div>
+        <h3 style="margin:18px 0 6px;font-size:19px;letter-spacing:-0.01em">大战场上分</h3>
+        <div class="service-price">¥25 / 场起</div>
+        <ul style="list-style:none;display:grid;gap:8px">
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 高胜率阵容与指挥</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 战绩实时同步</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 掉分包补</li>
+        </ul>
+      </article>
+      <article class="delta-card">
+        <span class="delta-tag">三角洲行动</span>
+        <div class="service-icon">🎮</div>
+        <h3 style="margin:18px 0 6px;font-size:19px;letter-spacing:-0.01em">撤离教学陪玩</h3>
+        <div class="service-price">¥30 / 小时</div>
+        <ul style="list-style:none;display:grid;gap:8px">
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 地图、枪械、撤离路线讲解</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 语音连麦实战陪玩</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 从零到单排撤离</li>
+        </ul>
+      </article>
+      <article class="delta-card">
+        <span class="delta-tag">三角洲行动</span>
+        <div class="service-icon">🔪</div>
+        <h3 style="margin:18px 0 6px;font-size:19px;letter-spacing:-0.01em">跑刀护航</h3>
+        <div class="service-price">¥12 / 局起</div>
+        <ul style="list-style:none;display:grid;gap:8px">
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 纯刀局低成本进场</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 大神带跑，保底撤离</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 物资快速积累，稳赚不亏</li>
+        </ul>
+      </article>
+      <article class="delta-card">
+        <span class="delta-tag">三角洲行动</span>
+        <div class="service-icon">💎</div>
+        <h3 style="margin:18px 0 6px;font-size:19px;letter-spacing:-0.01em">哈夫币保底</h3>
+        <div class="service-price">¥50 起 · 未达标赔付</div>
+        <ul style="list-style:none;display:grid;gap:8px">
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ ¥50 保 200万哈夫币</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ ¥100 保 500万哈夫币</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ ¥200 保 1200万哈夫币</li>
+          <li style="position:relative;padding-left:22px;font-size:14px;color:var(--text2)">✓ 24-48 小时到账，差额赔付</li>
+        </ul>
+      </article>
+    </div>
+    <div class="guarantee-strip">
+      <div class="guarantee-item"><b>战绩全透明</b>每局实时可查</div>
+      <div class="guarantee-item"><b>随时暂停</b>最多保留 72h</div>
+      <div class="guarantee-item"><b>掉装包赔</b>损失全额补偿</div>
+      <div class="guarantee-item"><b>大神执机</b>高分段真人</div>
+      <div class="guarantee-item"><b>售后 7 天</b>不满意可协商</div>
+      <div class="guarantee-item"><b>隐私保护</b>信息加密保存</div>
     </div>
   </section>
 
@@ -1151,6 +1324,19 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
         </ul>
         <button class="btn btn-ghost" data-open-sheet>选择套餐</button>
       </article>
+      <article class="plan">
+        <div class="plan-badge">三角洲 · 新</div>
+        <div class="plan-name">护航周卡</div>
+        <div class="plan-desc">三角洲行动烽火地带全装护航</div>
+        <div class="plan-price">¥288<small> / 周卡</small></div>
+        <ul>
+          <li>不限次护航撤离</li>
+          <li>专属指挥语音</li>
+          <li>掉装包赔</li>
+          <li>7 天售后保障</li>
+        </ul>
+        <button class="btn btn-primary" data-open-sheet>选择套餐</button>
+      </article>
     </div>
   </section>
 
@@ -1267,9 +1453,11 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
         <label>选择游戏</label>
         <div class="chips">
           <label><input type="radio" name="game" value="王者荣耀" checked><span>王者荣耀</span></label>
+          <label><input type="radio" name="game" value="三角洲行动"><span>三角洲行动</span></label>
           <label><input type="radio" name="game" value="英雄联盟"><span>英雄联盟</span></label>
           <label><input type="radio" name="game" value="和平精英"><span>和平精英</span></label>
           <label><input type="radio" name="game" value="原神"><span>原神</span></label>
+          <label><input type="radio" name="game" value="永劫无间"><span>永劫无间</span></label>
         </div>
       </div>
       <div class="field">
@@ -1279,6 +1467,11 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
           <option>巅峰赛上分</option>
           <option>双排陪练</option>
           <option>赛季陪玩</option>
+          <option>烽火地带护航</option>
+          <option>大战场上分</option>
+          <option>撤离陪玩</option>
+          <option>跑刀护航</option>
+          <option>哈夫币代刷</option>
         </select>
       </div>
       <div class="field">
@@ -1416,23 +1609,55 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
     })(performance.now());
   }
 
-  /* ---------- Progress bar (spring to 62%) ---------- */
-  const progressFill = document.getElementById('progressFill');
-  const progressText = document.getElementById('progressText');
-  if (progressFill) {
-    if (reduceMotion) {
-      progressFill.style.width = '62%';
-      progressText.textContent = '62%';
-    } else {
-      runSpring({ x: 0, v: 0 }, 62, {
-        stiffness: 90, damping: 26, precision: 0.2,
-        onUpdate: function (x) {
-          progressFill.style.width = x.toFixed(2) + '%';
-          progressText.textContent = Math.round(x) + '%';
-        }
-      });
-    }
+  /* ---------- Live order panel (polls backend) ---------- */
+  const liveStatus = document.getElementById('liveStatus');
+  const liveProgressWrap = document.getElementById('liveProgressWrap');
+  const liveProgressText = document.getElementById('liveProgressText');
+  const liveProgressFill = document.getElementById('liveProgressFill');
+  const liveNo = document.getElementById('liveNo');
+  const liveService = document.getElementById('liveService');
+  const liveRanks = document.getElementById('liveRanks');
+  const liveTime = document.getElementById('liveTime');
+  const liveGrid = document.getElementById('liveGrid');
+  const liveEmpty = document.getElementById('liveEmpty');
+
+  function liveStatusClass(status) {
+    if (status === '进行中') return 'doing';
+    if (status === '已完成') return 'done';
+    return 'confirm';
   }
+
+  async function loadLiveOrder() {
+    let contact = '';
+    try { contact = localStorage.getItem('peak_last_contact') || ''; } catch (err) {}
+    try {
+      const res = await fetch('/api/orders/latest?contact=' + encodeURIComponent(contact));
+      const data = await res.json().catch(function () { return null; });
+      const order = data && data.order;
+      if (!order) {
+        liveStatus.textContent = '暂无订单';
+        liveStatus.className = 'hc-pill idle';
+        liveProgressWrap.hidden = true;
+        liveGrid.hidden = true;
+        liveEmpty.hidden = false;
+        return;
+      }
+      liveStatus.textContent = '● ' + order.status;
+      liveStatus.className = 'hc-pill ' + liveStatusClass(order.status);
+      liveNo.textContent = order.order_no || '--';
+      liveService.textContent = (order.game || '') + ' · ' + (order.service || '');
+      liveRanks.textContent = (order.currentRank || '') + ' → ' + (order.targetRank || '');
+      liveTime.textContent = order.created_at || '--';
+      const p = Math.max(0, Math.min(100, parseInt(order.progress, 10) || 0));
+      liveProgressFill.style.width = p + '%';
+      liveProgressText.textContent = p + '%';
+      liveProgressWrap.hidden = false;
+      liveGrid.hidden = false;
+      liveEmpty.hidden = true;
+    } catch (err) {}
+  }
+  loadLiveOrder();
+  setInterval(loadLiveOrder, 6000);
 
   /* ---------- Bottom sheet ---------- */
   const sheet = document.getElementById('sheet');
@@ -1669,6 +1894,7 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; }
         osNo.textContent = data.order.order_no;
         osStatus.textContent = data.order.status;
         orderContact.value = contactValue;
+        loadLiveOrder();
         form.hidden = true;
         orderSuccess.hidden = false;
         try { localStorage.setItem('peak_last_contact', contactValue); } catch (err) {}
