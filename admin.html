@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peak 代练 · 管理后台</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #070b14;
+  --text: #f5f5f7;
+  --text2: #a1a1a6;
+  --accent: #0a84ff;
+  --card: rgba(28, 30, 36, .8);
+  --border: rgba(255, 255, 255, .12);
+  --shadow: 0 18px 50px rgba(0, 0, 0, .5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  background:
+    radial-gradient(900px 500px at 50% -10%, rgba(10, 132, 255, .12), transparent 60%),
+    linear-gradient(180deg, #070b14, #0b1224);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 40px 22px 80px; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+.brand { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.brand span { color: var(--accent); }
+.sub { font-size: 13px; color: var(--text2); margin-top: 4px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; cursor: pointer; border-radius: 980px; font: inherit;
+  font-size: 14px; font-weight: 600; padding: 10px 20px;
+  transition: transform .12s ease-out, background .2s, box-shadow .25s;
+}
+.btn:active { transform: scale(.96); }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 8px 20px rgba(10, 132, 255, .28); }
+.btn-primary:hover { background: #0a93ff; }
+.btn-ghost { background: rgba(255, 255, 255, .1); color: var(--text); }
+.btn-ghost:hover { background: rgba(255, 255, 255, .16); }
+.btn-danger { background: rgba(255, 69, 58, .16); color: #ff6961; }
+.btn-danger:hover { background: rgba(255, 69, 58, .26); }
+
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+  box-shadow: var(--shadow); backdrop-filter: blur(18px) saturate(160%);
+  padding: 26px;
+}
+.login-box { max-width: 380px; margin: 12vh auto 0; text-align: center; }
+.login-box h1 { font-size: 22px; letter-spacing: -0.02em; margin-bottom: 8px; }
+.login-box p { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
+.field input {
+  width: 100%; padding: 13px 15px; border-radius: 14px; font: inherit; font-size: 15px;
+  border: 1px solid var(--border); background: rgba(7, 11, 20, .7); color: var(--text);
+  outline: none; transition: border-color .2s, box-shadow .2s; margin-bottom: 14px;
+}
+.field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10, 132, 255, .18); }
+.field input.invalid { border-color: #ff453a; }
+.err { display: block; color: #ff6961; font-size: 12px; margin: -8px 0 12px; min-height: 16px; }
+
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.toolbar h2 { font-size: 18px; letter-spacing: -0.01em; }
+.stat-line { font-size: 13px; color: var(--text2); }
+.table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+th, td { padding: 13px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { font-size: 11px; letter-spacing: .06em; color: var(--text2); background: rgba(255, 255, 255, .04); }
+tr:last-child td { border-bottom: 0; }
+tr:hover td { background: rgba(255, 255, 255, .03); }
+.mono { font-weight: 600; }
+.status {
+  padding: 4px 11px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  background: rgba(10, 132, 255, .14); color: #64d2ff; border: 0;
+}
+.status.doing { background: rgba(255, 214, 10, .12); color: #ffd60a; }
+.status.done { background: rgba(52, 199, 89, .14); color: #34c759; }
+.status-select {
+  padding: 6px 10px; border-radius: 10px; font: inherit; font-size: 12px;
+  background: rgba(7, 11, 20, .7); color: var(--text);
+  border: 1px solid var(--border); outline: none; cursor: pointer;
+}
+.empty { text-align: center; color: var(--text2); padding: 36px 0; font-size: 14px; }
+.toast {
+  position: fixed; top: 22px; left: 50%; transform: translate(-50%, -16px);
+  background: rgba(28, 28, 30, .92); color: #fff; padding: 12px 22px;
+  border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none;
+  transition: opacity .3s, transform .35s cubic-bezier(.21, 1.02, .35, 1); z-index: 100;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 640px) { .wrap { padding: 24px 14px 60px; } .card { padding: 18px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="brand">Peak<span>代练</span> · 管理后台</div>
+      <div class="sub">查看订单、更新状态、删除测试数据</div>
+    </div>
+    <div id="headActions" hidden>
+      <button class="btn btn-ghost" id="refreshBtn">刷新</button>
+      <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+    </div>
+  </div>
+
+  <div class="card login-box" id="loginView">
+    <h1>管理员登录</h1>
+    <p>输入服务端配置的 ADMIN_PASSWORD</p>
+    <div class="field">
+      <input type="password" id="password" placeholder="管理密码" autocomplete="current-password">
+    </div>
+    <span class="err" id="loginErr"></span>
+    <button class="btn btn-primary" id="loginBtn" style="width:100%">登录</button>
+  </div>
+
+  <div class="card" id="ordersView" hidden>
+    <div class="toolbar">
+      <h2>全部订单</h2>
+      <span class="stat-line" id="statLine"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>订单号</th>
+            <th>游戏</th>
+            <th>服务</th>
+            <th>段位</th>
+            <th>联系方式</th>
+            <th>提交时间</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="emptyRow" hidden>暂无订单</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  const loginView = document.getElementById('loginView');
+  const ordersView = document.getElementById('ordersView');
+  const headActions = document.getElementById('headActions');
+  const password = document.getElementById('password');
+  const loginErr = document.getElementById('loginErr');
+  const loginBtn = document.getElementById('loginBtn');
+  const tbody = document.getElementById('tbody');
+  const emptyRow = document.getElementById('emptyRow');
+  const statLine = document.getElementById('statLine');
+  const toast = document.getElementById('toast');
+  let toastTimer = null;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 3000);
+  }
+
+  async function api(path, options) {
+    const res = await fetch(path, options);
+    const data = await res.json().catch(function () { return null; });
+    if (!res.ok) throw new Error((data && data.error) || ('HTTP ' + res.status));
+    return data;
+  }
+
+  function statusClass(s) {
+    if (s === '进行中') return 'doing';
+    if (s === '已完成') return 'done';
+    return 'confirm';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function renderOrders(orders) {
+    tbody.innerHTML = '';
+    emptyRow.hidden = orders.length > 0;
+    statLine.textContent = orders.length ? '共 ' + orders.length + ' 单' : '';
+    orders.forEach(function (o) {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="mono">' + esc(o.order_no) + '</td>' +
+        '<td>' + esc(o.game) + '</td>' +
+        '<td>' + esc(o.service) + '</td>' +
+        '<td>' + esc(o.currentRank) + ' → ' + esc(o.targetRank) + '</td>' +
+        '<td>' + esc(o.contact) + '</td>' +
+        '<td>' + esc(o.created_at) + '</td>' +
+        '<td><span class="status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></td>' +
+        '<td style="display:flex;gap:8px">' +
+          '<select class="status-select" data-id="' + o.id + '" data-action="status">' +
+            '<option value="待确认"' + (o.status === '待确认' ? ' selected' : '') + '>待确认</option>' +
+            '<option value="进行中"' + (o.status === '进行中' ? ' selected' : '') + '>进行中</option>' +
+            '<option value="已完成"' + (o.status === '已完成' ? ' selected' : '') + '>已完成</option>' +
+          '</select>' +
+          '<button class="btn btn-danger btn-small" data-id="' + o.id + '" data-action="delete" style="padding:6px 12px;font-size:12px">删除</button>' +
+        '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function loadOrders() {
+    try {
+      const data = await api('/api/admin/orders');
+      renderOrders(data.orders || []);
+    } catch (err) {
+      showToast(err.message);
+    }
+  }
+
+  async function checkAuth() {
+    try {
+      await api('/api/admin/me');
+      loginView.hidden = true;
+      ordersView.hidden = false;
+      headActions.hidden = false;
+      loadOrders();
+    } catch (err) {
+      loginView.hidden = false;
+      ordersView.hidden = true;
+      headActions.hidden = true;
+    }
+  }
+
+  loginBtn.addEventListener('click', async function () {
+    loginErr.textContent = '';
+    const value = password.value;
+    if (!value) {
+      loginErr.textContent = '请输入密码';
+      password.classList.add('invalid');
+      return;
+    }
+    password.classList.remove('invalid');
+    loginBtn.disabled = true;
+    loginBtn.textContent = '登录中…';
+    try {
+      await api('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: value })
+      });
+      password.value = '';
+      await checkAuth();
+      showToast('登录成功');
+    } catch (err) {
+      loginErr.textContent = err.message;
+      password.classList.add('invalid');
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = '登录';
+    }
+  });
+  password.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') loginBtn.click();
+  });
+  password.addEventListener('input', function () {
+    loginErr.textContent = '';
+    password.classList.remove('invalid');
+  });
+
+  document.getElementById('refreshBtn').addEventListener('click', loadOrders);
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    document.cookie = 'peak_admin=; Max-Age=0; Path=/';
+    checkAuth();
+  });
+
+  tbody.addEventListener('change', async function (e) {
+    if (e.target.dataset.action !== 'status') return;
+    try {
+      await api('/api/admin/orders/' + e.target.dataset.id + '/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: e.target.value })
+      });
+      showToast('状态已更新');
+      loadOrders();
+    } catch (err) {
+      showToast(err.message);
+      loadOrders();
+    }
+  });
+
+  tbody.addEventListener('click', async function (e) {
+    if (e.target.dataset.action !== 'delete') return;
+    if (!confirm('确定删除该订单？')) return;
+    try {
+      await api('/api/admin/orders/' + e.target.dataset.id, { method: 'DELETE' });
+      showToast('已删除');
+      loadOrders();
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+
+  checkAuth();
+})();
+</script>
+</body>
+</html>
